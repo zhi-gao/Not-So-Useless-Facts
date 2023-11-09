@@ -22,6 +22,7 @@ PORT=4000
 FRONTEND_HOST=http://localhost:3000/
 DATABASE_PASSWORD=abc123
 DATABASE_URL=mongodb://root:abc123@localhost:27017/nsuf?directConnection=true&authSource=admin&retryWrites=true
+API_NINJA_API_KEY=
 ```
 
 ## Database

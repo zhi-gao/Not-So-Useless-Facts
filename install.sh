@@ -13,7 +13,7 @@ echo "-------------------------------------------------"
 
 sleep 1
 
-echo -e "DEV_MODE=dev\nPORT=\nFRONTEND_HOST=\nDATABASE_PASSWORD=\nDATABASE_URL=\n" > .env
+echo -e "DEV_MODE=dev\nPORT=\nFRONTEND_HOST=\nDATABASE_PASSWORD=\nDATABASE_URL=\nAPI_NINJA_API_KEY=\n" > .env
 
 cd ..
 echo "-------------------------------------------------"
