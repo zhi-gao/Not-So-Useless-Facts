@@ -24,7 +24,29 @@ DATABASE_PASSWORD=abc123
 DATABASE_URL=mongodb://root:abc123@localhost:27017/nsuf?directConnection=true&authSource=admin&retryWrites=true
 ```
 
+## Database
+You can get a database connection with either MongoDB ATLAS, locally if hosted on your computer, or using Docker (fastest and recommended).
+
+Once you have setup your server, just update your `.env` and changed the variable `DATABASE_URL=mongodb://root:<mongodb-password>@<host>:<port>/<project-name>?directConnection=true&authSource=admin&retryWrites=true`
+
+## Contributing
+If you are going to push your changes, **please push to a seperate branch FIRST and submit a PR**.
+
+Feel free to assign one of us to review your code and push if it has been approved.
+
+Once your changes has been merged with main, **please delete the branch** to avoid any further confusion going forward.
+
+**It is recommended that your branch should be named related to the feature/bug that you are current working with**
+
+|Feature/bugs| Sample Branch Name |
+--------------|-----------------
+|Front page CSS | front-page-css|
+|Display upvotes/downvotes to user | display-ratings|
+|Fixing the 3rd API with invalid params | fixing-backend-api|
+
 ## Contributors:
 Chenhao Li
+
 Richard Yeung
+
 Zhi Gao
