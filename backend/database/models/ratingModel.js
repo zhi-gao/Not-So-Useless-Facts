@@ -13,11 +13,11 @@ const Schema = mongoose.Schema
 
 const ratingSchema = new Schema({
     userId:{
-        type: Number,
+        type : [mongoose.Types.ObjectId],
         required: true
     },
     factId:{
-        type: Number,
+        type : [mongoose.Types.ObjectId],
         required: true
     },
     rated: {
