@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom"
-import styles from "./Login.module.css"
+import styles from "./UserLogin.module.css"
+import Navbar from "../components/Nabar";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -25,24 +26,26 @@ export default function Login() {
         // make request
     }
 
-    return <div className={styles.flexContainer}>
+    return <div>
+        <Navbar />
+        <div className={styles.flexContainer}>
+            <form onSubmit={submitHandler} className={styles.container}>
+                <h1>Login</h1>
+                <div className={styles.inputContainer}>
+                    <label>Email:</label>
+                    <input ref={emailRef} /><br></br>
+                </div>
 
-        <form onSubmit={submitHandler} className={styles.login}>
-            <h1>Login</h1>
-            <div className={styles.inputContainer}>
-                <label>Email:</label>
-                <input ref={emailRef} /><br></br>
-            </div>
+                <div className={styles.inputContainer}>
+                    <label>Password:</label>
+                    <input ref={passwordRef} type="password" /><br></br>
+                </div>
 
-            <div className={styles.inputContainer}>
-                <label>Password:</label>
-                <input ref={passwordRef} type="password" /><br></br>
-            </div>
-
-            <div id={styles.centerContainer}>
-                <a onClick={() => navigate("/register")}>New User? Register</a><br></br>
-                <button>Login</button>
-            </div>
-        </form>
-    </div>
+                <div className={styles.centerContainer}>
+                    <a onClick={() => navigate("/register")}>New User? Register</a><br></br>
+                    <button>Login</button>
+                </div>
+            </form>
+        </div>
+    </div>   
 }

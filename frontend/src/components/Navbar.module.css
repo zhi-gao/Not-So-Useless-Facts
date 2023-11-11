@@ -1,0 +1,15 @@
+#navbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 50px;    
+    margin-right: 20px;
+    margin-top: 20px;
+}
+
+#navbar button {
+    margin: 10px;
+    width: 100px;
+    height: 35px;
+    cursor: pointer;
+}
