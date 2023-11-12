@@ -41,7 +41,9 @@ export default function Register() {
     }
 
     return <div>
-        <Navbar />
+        <Navbar primaryButton="Home" primaryButtonOnClick={() => navigate("/")} 
+                secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}
+                thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />
         <div className={styles.flexContainer}>
             <form onSubmit={submitHandler} className={styles.container}>
                 <h1>Register</h1>

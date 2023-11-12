@@ -1,8 +1,9 @@
-import { useState } from 'react'
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import About from "./pages/About"
+import PastFacts from "./pages/PastFacts"
 
 function App() {
   return <div>
@@ -11,6 +12,9 @@ function App() {
         <Route exact path='/' element={<Home />}/>
         <Route exact path='/login' element={<Login />}/>
         <Route exact path='/register' element={<Register />}/>
+        <Route exact path='/about' element={<About />}/>
+        <Route exact path='/all-facts' element={<PastFacts />}/>
+
       </Routes>
     </BrowserRouter>
   </div>
