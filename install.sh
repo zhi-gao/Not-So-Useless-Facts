@@ -13,7 +13,13 @@ echo "-------------------------------------------------"
 
 sleep 1
 
-echo -e "DEV_MODE=dev\nPORT=\nFRONTEND_HOST=\nDATABASE_PASSWORD=\nDATABASE_URL=\nAPI_NINJA_API_KEY=\n" > .env
+if [[ -e .env ]]; then
+    echo "The file .env exists, skipping"
+else
+    echo "The file .env does not exist, creating the file"
+    sleep 1
+    echo -e "DEV_MODE=dev\nPORT=\nFRONTEND_HOST=\nDATABASE_PASSWORD=\nDATABASE_URL=\n" > .env
+fi
 
 cd ..
 echo "-------------------------------------------------"
@@ -26,5 +32,9 @@ cd frontend
 npm install
 
 cd ..
+
+echo "All dependencies have been installed, please update the .env files"
+echo "To run the frontend, do cd frontend && npm run dev"
+echo "To run the backend, do cd backend && npm run dev"
 
 exec bash

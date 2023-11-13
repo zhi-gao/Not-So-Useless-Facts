@@ -1,0 +1,15 @@
+.flexContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+}
+
+#fotd {
+    font-size: 45px;
+    margin-top: -50px;
+    margin-left: 15%;
+    margin-right: 15%;
+}
