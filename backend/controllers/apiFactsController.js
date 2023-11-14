@@ -1,18 +1,22 @@
 const axios = require("axios");
+const { insertFact, fetchLatestFact} = require("../database");
 
 const MAIN_FACTS_API = "https://api.api-ninjas.com/v1/facts?limit=1";
 const BACKUP_FACTS_API = "https://uselessfacts.jsph.pl/api/v2/facts/random";
 
-async function insertFactIntoDatabase(fact) {
-    // TODO
-}
-
 async function factOfTheDayController(_, res) {
     // use api-ninja's api as default
 
-    // TODO
     // search in the db if we have already documentated today's fact
-    // if we have, fetch from our own db, else call the 3red part api to get a new fact
+    const latestFact = await fetchLatestFact();
+    const currentDate = new Date().toDateString();
+
+    // daily fact found and is already in db
+    if(latestFact && new Date(currentDate).getTime() == new Date(latestFact.createdAt).getTime()) {
+        return res.json({status : "OK", fact : latestFact.fact, sourcedFrom: `${latestFact.sourceFrom} cached`});
+    }
+
+    // cannot find a fact in db
     try {
         const apiRes = await axios.get(MAIN_FACTS_API, {
             headers : {
@@ -26,11 +30,10 @@ async function factOfTheDayController(_, res) {
         const fact = data[0]?.fact;
         if(!fact) return res.status(500).json({status : "Fact was not retrived"});
 
-        // TODO
         // make a entry into the db
-        insertFactIntoDatabase(fact);
+        await insertFact(fact, "api-ninja");
 
-        return res.json({status : "OK", fact});
+        return res.json({status : "OK", fact, sourcedFrom: "api-ninja"});
     } catch (err) {
         console.error(err);
         
@@ -44,11 +47,10 @@ async function factOfTheDayController(_, res) {
     
         if(!fact) return res.status(500).json({status : "Fact was not retrived"});
     
-        // TODO
         // make a entry into the db
-        insertFactIntoDatabase(fact);
+        insertFact(fact, "useless-facts")
 
-        return res.json({status : "OK", fact});    
+        return res.json({status : "OK", fact, sourcedFrom : "useless-facts"});    
     }
 }
 
