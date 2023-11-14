@@ -4,6 +4,7 @@ const { initDatabase } = require("./database");
 require("dotenv").config();
 
 const userRouter = require("./routes/userRoutes");
+const apiFactsRouter = require("./routes/factsApiRoutes");
 
 const PORT = process.env.PORT || 4000;
 const app = express();
@@ -16,6 +17,7 @@ app.use(cors({
 
 app.get("/", (req, res) => res.json({status : "OK"}));
 app.use(userRouter);
+app.use(apiFactsRouter);
 
 initDatabase().then(() => {
     app.listen(PORT, () => {
