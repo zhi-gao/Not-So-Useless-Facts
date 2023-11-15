@@ -6,14 +6,17 @@ const Login = require('../database/models/loginModel')
 const Fact = require('../database/models/factModel')
 const Rating = require('../database/models/ratingModel')
 const Comment = require('../database/models/commentModel')
-
+const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 
 async function loginController(req, res) {
     const { username, password } = req.body;
 
+    // return res.json({username, password})
+
     try{
         const user = await (Login.findOne({username}))
+
         // check if user exist
         if(!user){
             return res.status(401).json({message: "Error: Incorrect Login"})
@@ -22,14 +25,11 @@ async function loginController(req, res) {
         // Compare password with encrypted password
         const isPasswordValid = await bcrypt.compare(password, user.hashedPassword)
 
-        // check if password is correct with associated user. Right now jsut checking strings
-        // const isPasswordValid = await password === user.password
-
         if(!isPasswordValid){
             return res.status(401).json({message: "Error: Incorrect Login"})
         }
         //successful login
-        req.session.user = {id: user._id, username: user.username};
+        req.session.user = {id: user._id, username: user.username}; ???
         res.json({message: 'Login Successful', user: req.session.user})
     } catch (error){
         console.error(error)
@@ -59,23 +59,25 @@ async function logoutController(req, res) {
 async function registerController(req, res) {
     const {username, password, email} = req.body
 
-    if(Login.some((user) => user.username == username)) {
-        return res.status(400).json({message: "Username already exist"})
-    }
+    // console.log(`${username}, ${password}, ${email}`)
 
-    if(Login.some((email) => user.email == email)) {
-        return res.status(400).json({message: "Email already exist"})
+    const usernameExist = await Login.exists({username: {$regex: new RegExp(username, 'i')}});
+
+    if(usernameExist){
+        return res.status(400).json({message: "Username already exist"})
     }
 
     try{
         // encrypt password
-        const hashedPassword = await bcrypt.hash(password, process.env.SALTROUNDS)
+        const salt = await bcrypt.genSalt(SALT_ROUNDS)
+
+        const hashedPassword = await bcrypt.hash(password, salt)
 
         const newUser = {username, hashedPassword, email};
-        Login.push(newUser);
 
-        res.json({message: "User registration successful", user: newUser})
-        res.status(200).json(newUser)
+        const createUser = await Login.create(newUser)
+
+        res.status(200).json({message: "User registration successful", user: newUser})
     } catch (err) {
         console.error("Error during registration: ", err);
     }
@@ -96,7 +98,6 @@ async function upvoteFactController(req, res) {
     */ 
 
     const newUser = await Login.findByID(user._id)
-
 
     // const newUser = await Login.findOneAndUpdate(
     //     {_id: userID}, 
