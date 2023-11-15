@@ -6,6 +6,8 @@ If the user votes the same thing twice, then it should count as a no-vote
 Instead of removing it, as it may cause issues if someone decides to spam-click a vote,
 we can just change the state of Rated. 
 This means that when someone votes on a comment, we must search if they have voted on it before
+
+As of now, it is not in use
 */
 
 const mongoose = require('mongoose')
@@ -30,4 +32,4 @@ const ratingSchema = new Schema({
     }
 }, {timestamps: true})
 
-module.exports = mongoose.model('Rating', ratingSchema)
+// module.exports = mongoose.model('Rating', ratingSchema)
