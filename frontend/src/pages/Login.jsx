@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom"
 import styles from "./UserLogin.module.css"
 import Navbar from "../components/Nabar";
+import { loginRequest } from "../requests/loginRequest";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -16,14 +17,15 @@ export default function Login() {
         const password = passwordRef.current?.value || "";
 
         if(!email) {
-
+            console.error(`No email given`);
         }
 
         if(!password) {
-
+            console.error(`No password given`);
         }
 
         // make request
+        await loginRequest(email, password);
     }
 
     return <div>
