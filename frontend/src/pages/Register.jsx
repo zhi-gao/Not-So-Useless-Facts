@@ -37,6 +37,9 @@ export default function Register() {
 
         }
 
+        const emailRegex = new RegExp("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+        const passwordRegex = new RegExp("^(?=.*[0-9])(.{9,})$");
+
         // make request
     }
 
