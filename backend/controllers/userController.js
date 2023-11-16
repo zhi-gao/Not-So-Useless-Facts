@@ -8,6 +8,7 @@ const Rating = require('../database/models/ratingModel')
 const Comment = require('../database/models/commentModel')
 const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 async function loginController(req, res) {
     const { username, password } = req.body;
@@ -28,9 +29,12 @@ async function loginController(req, res) {
         if(!isPasswordValid){
             return res.status(401).json({message: "Error: Incorrect Login"})
         }
+
+        // Generate jwt token
+        const token = jwt.sign({user: user._id, username: user.username}, 'your-secret-key', {expiresIn: '1h'})
+
         //successful login
-        req.session.user = {id: user._id, username: user.username}; ???
-        res.json({message: 'Login Successful', user: req.session.user})
+        res.json({message: 'Login Successful', token})
     } catch (error){
         console.error(error)
         res.status(500).json({message: "Internal Server Error"})
@@ -42,14 +46,14 @@ async function loginController(req, res) {
  * Functionality of processing the logout request goes here
  */
 async function logoutController(req, res) {
-    req.session.destroy((err) => {
-        if(err){
-            console.error(err)
-            return res.status(500).json({message: "Internal Server Error"})
-        }
+    try{
+        res.clearCooke('jwtToken')
 
-        res.json({message: "Logout Successful"})
-    })
+        res.json({message: "Logged out Successful"})
+    }catch (error){
+        console.error(error);
+        res.status(500).json({message: "Internal Server Error"})
+    }
 }
 
 /**
@@ -65,6 +69,12 @@ async function registerController(req, res) {
 
     if(usernameExist){
         return res.status(400).json({message: "Username already exist"})
+    }
+
+    const emailExist = await Login.exists({email: {$regex: new RegExp(email, 'i')}});
+
+    if(emailExist){
+        return res.status(400).json({message: "Email already exist"})
     }
 
     try{
