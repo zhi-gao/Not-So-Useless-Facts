@@ -4,19 +4,87 @@
 */
 const Login = require('../database/models/loginModel')
 const Fact = require('../database/models/factModel')
-const Rating = require('../database/models/ratingModel')
-const Comment = require('../database/models/commentModel')
 const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-async function loginController(req, res) {
-    const { username, password } = req.body;
+async function authController(req, res) {
+    const {email, username} = req.body;
 
-    // return res.json({username, password})
+    // get access token
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(400).send();
+    }
+
+    const line = authHeader.split(" ");
+
+    // no auth token provided
+    if (line.length < 2 || line[0] !== 'Bearer') {
+        return res.status(401).send();
+    }
+
+    const accessToken = line[1];
+
+    // get current refresh token
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(401).send();
+    }
+
+    const ACCESS_TOKEN_KEY = process.env.JWT_ACCESS_TOKEN_KEY;
+    const REFRESH_TOKEN_KEY = process.env.JWT_REFRESH_TOKEN_KEY;
+
+    console.log({accessToken, refreshToken});
+
+    // verify access token
+    jwt.verify(accessToken, ACCESS_TOKEN_KEY, (err, decodedAccessToken) => {
+        if (!err) {
+            return res.json({
+                user_id: decodedAccessToken.user_id,
+                email: decodedAccessToken.email,
+                username: decodedAccessToken.username,
+                accessToken: accessToken,
+            });
+        };
+
+        // access token err
+        if (!err.message.includes("expire")) return res.send(500).json({status : "Error generated when trying to validate access token"});
+
+        // verify that the refresh token
+        jwt.verify(refreshToken, REFRESH_TOKEN_KEY, async (err, decodedRefreshToken) => {
+            // expired refresh token
+            if (err) return res.status(403).json({status : "Refresh token expired"});
+
+            // token not expired
+            try {
+                // verify that refresh token is valid
+
+                // generate a new access token
+                const newAccessToken = jwt.sign({user_id: decodedRefreshToken.user_id, username: decodedRefreshToken.username, email : decodedRefreshToken.email}, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
+
+                return res.json({
+                    user_id: decodedRefreshToken.user_id,
+                    email: decodedRefreshToken.email,
+                    username: decodedRefreshToken.username,
+                    accessToken: newAccessToken,
+                });
+                
+            } catch (err) {
+                console.error(err);
+                return res.status(500).json({status : "Error generated when trying to generating a new access token"});
+            }
+        });
+    });
+}
+
+async function loginController(req, res) {
+    const { email, password } = req.body;
 
     try{
-        const user = await (Login.findOne({username}))
+        const user = await (Login.findOne({email}))
 
         // check if user exist
         if(!user){
@@ -30,11 +98,20 @@ async function loginController(req, res) {
             return res.status(401).json({message: "Error: Incorrect Login"})
         }
 
-        // Generate jwt token
-        const token = jwt.sign({user: user._id, username: user.username}, 'your-secret-key', {expiresIn: '1h'})
+        // Generate both access and refresh tokens
+        const ACCESS_TOKEN_KEY = process.env.JWT_ACCESS_TOKEN_KEY;
+        const REFRESH_TOKEN_KEY = process.env.JWT_REFRESH_TOKEN_KEY;
+
+        const accessToken = jwt.sign({user_id: user._id, username: user.username, email : user.email}, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
+
+        const refreshToken = jwt.sign({user_id: user._id, username: user.username, email : user.email}, REFRESH_TOKEN_KEY, {expiresIn: '30s'});
 
         //successful login
-        res.json({message: 'Login Successful', token})
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly : true
+        });
+
+        res.json({message: 'Login Successful', accessToken});
     } catch (error){
         console.error(error)
         res.status(500).json({message: "Internal Server Error"})
@@ -63,8 +140,6 @@ async function logoutController(req, res) {
 async function registerController(req, res) {
     const {username, password, email} = req.body
 
-    // console.log(`${username}, ${password}, ${email}`)
-
     const usernameExist = await Login.exists({username: {$regex: new RegExp(username, 'i')}});
 
     if(usernameExist){
@@ -80,14 +155,11 @@ async function registerController(req, res) {
     try{
         // encrypt password
         const salt = await bcrypt.genSalt(SALT_ROUNDS)
-
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        const newUser = {username, hashedPassword, email};
+        await Login.create({username, hashedPassword, email});
 
-        const createUser = await Login.create(newUser)
-
-        res.status(200).json({message: "User registration successful", user: newUser})
+        res.json({message: "User registration successful"})
     } catch (err) {
         console.error("Error during registration: ", err);
     }
@@ -165,8 +237,8 @@ async function postCommentController(req, res) {
 
 }
 
-
 module.exports = {
+    authController,
     loginController,
     logoutController,
     registerController,
