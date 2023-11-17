@@ -9,35 +9,32 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 async function authController(req, res) {
-    const {email, username} = req.body;
-
     // get access token
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.status(400).send();
+        return res.status(400).send({status : "No auth header given"});
     }
 
     const line = authHeader.split(" ");
 
     // no auth token provided
     if (line.length < 2 || line[0] !== 'Bearer') {
-        return res.status(401).send();
+        return res.status(401).send({status : "No bearer token given"});
     }
 
     const accessToken = line[1];
 
     // get current refresh token
     const refreshToken = req.cookies.refreshToken;
+    console.log(req.cookies.refreshToken);
 
     if (!refreshToken) {
-        return res.status(401).send();
+        return res.status(401).send({status : "No refresh token given"});
     }
 
     const ACCESS_TOKEN_KEY = process.env.JWT_ACCESS_TOKEN_KEY;
     const REFRESH_TOKEN_KEY = process.env.JWT_REFRESH_TOKEN_KEY;
-
-    console.log({accessToken, refreshToken});
 
     // verify access token
     jwt.verify(accessToken, ACCESS_TOKEN_KEY, (err, decodedAccessToken) => {
@@ -102,16 +99,22 @@ async function loginController(req, res) {
         const ACCESS_TOKEN_KEY = process.env.JWT_ACCESS_TOKEN_KEY;
         const REFRESH_TOKEN_KEY = process.env.JWT_REFRESH_TOKEN_KEY;
 
-        const accessToken = jwt.sign({user_id: user._id, username: user.username, email : user.email}, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
+        const newUser = {user_id: user._id, username: user.username, email : user.email}
+        const accessToken = jwt.sign(newUser, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
 
-        const refreshToken = jwt.sign({user_id: user._id, username: user.username, email : user.email}, REFRESH_TOKEN_KEY, {expiresIn: '30s'});
+        const refreshToken = jwt.sign(newUser, REFRESH_TOKEN_KEY, {expiresIn: '30s'});
 
         //successful login
         res.cookie("refreshToken", refreshToken, {
             httpOnly : true
         });
 
-        res.json({message: 'Login Successful', accessToken});
+        res.json({message: 'Login Successful', accessToken, 
+            user_id : newUser.user_id,
+            username : newUser.username,
+            email : newUser.email
+        });
+
     } catch (error){
         console.error(error)
         res.status(500).json({message: "Internal Server Error"})

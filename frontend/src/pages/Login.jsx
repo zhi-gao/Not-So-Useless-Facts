@@ -32,8 +32,9 @@ export default function Login() {
         try {
             const data = await loginRequest(email, password);
 
-            // TODO
-            // store access token, userId, and email 
+            console.log(data);
+            localStorage.setItem("token", data.accessToken);
+            navigate("/profile");
         } catch (err) {
             console.error(err);
             setErrorMessage("Internal Server Error");

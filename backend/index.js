@@ -11,11 +11,11 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-    credentials : true,
-    origin : [process.env.DEV_MODE != "production" ? "*" : process.env.FRONTEND_HOST]
-}));
 app.use(cookieParser());
+app.use(cors({
+    origin : "http://localhost:5173",
+    credentials : true,    
+}));
 
 app.get("/", (req, res) => res.json({status : "OK"}));
 app.use(userRouter);
@@ -28,6 +28,3 @@ initDatabase().then(() => {
 }).catch(err => {
     console.error(err);
 });
-
-
-
