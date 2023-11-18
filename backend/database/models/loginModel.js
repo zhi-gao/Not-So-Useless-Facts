@@ -20,7 +20,7 @@ const loginSchema = new Schema({
         unique : true,
     },
 
-    password:{
+    hashedPassword:{
         type: String,
         required: true
     },
