@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import { authRequest } from "../requests/authRequest";
 import { useNavigate } from "react-router-dom";
+import { logoutRequest } from "../requests/logoutRequest";
 
 export default function Profile() {
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -12,6 +14,7 @@ export default function Profile() {
                 const data = await authRequest();
 
                 console.log(data);
+                setUser(data);
                 setLoading(false);
             } catch (err) {
                 console.error(err);
@@ -22,6 +25,15 @@ export default function Profile() {
         auth();
     }, []);
 
+    async function logoutHandler(e) {
+        try {
+            await logoutRequest(user.email);
+            navigate("/login");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     if(loading) {
         return <div>
             Profile loading...
@@ -30,5 +42,6 @@ export default function Profile() {
 
     return <div>
         Profile
+        <button onClick={logoutHandler}>Logout</button>
     </div>
 }

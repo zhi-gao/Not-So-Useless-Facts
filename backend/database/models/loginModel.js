@@ -39,6 +39,11 @@ const loginSchema = new Schema({
         type : [mongoose.Types.ObjectId],
         required : false,
     },
+
+    refreshTokens : {
+        type : [String],
+        required : false,
+    }
 }, {timestamps: true})
 
 module.exports = mongoose.model('Login', loginSchema)

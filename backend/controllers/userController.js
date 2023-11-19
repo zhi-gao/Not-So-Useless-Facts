@@ -27,7 +27,6 @@ async function authController(req, res) {
 
     // get current refresh token
     const refreshToken = req.cookies.refreshToken;
-    console.log(req.cookies.refreshToken);
 
     if (!refreshToken) {
         return res.status(401).send({status : "No refresh token given"});
@@ -53,14 +52,24 @@ async function authController(req, res) {
         // verify that the refresh token
         jwt.verify(refreshToken, REFRESH_TOKEN_KEY, async (err, decodedRefreshToken) => {
             // expired refresh token
-            if (err) return res.status(403).json({status : "Refresh token expired"});
+            if (err) {
+                return res.status(403).json({status : "Refresh token expired"});
+            }
 
             // token not expired
             try {
                 // verify that refresh token is valid
+                const user = await Login.findOne({email : decodedRefreshToken.email});
+                if(!user) return res.status(401).json({status : "No user found"});
+
+                const validRefreshTokens = user.refreshTokens
+
+                if(validRefreshTokens.find(e => e === refreshToken) === undefined) {
+                    return res.status(401).json({status : "Cannot find refresh token"});
+                }
 
                 // generate a new access token
-                const newAccessToken = jwt.sign({user_id: decodedRefreshToken.user_id, username: decodedRefreshToken.username, email : decodedRefreshToken.email}, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
+                const newAccessToken = jwt.sign({user_id: decodedRefreshToken.user_id, username: decodedRefreshToken.username, email : decodedRefreshToken.email}, ACCESS_TOKEN_KEY, {expiresIn: '1h'});
 
                 return res.json({
                     user_id: decodedRefreshToken.user_id,
@@ -100,9 +109,12 @@ async function loginController(req, res) {
         const REFRESH_TOKEN_KEY = process.env.JWT_REFRESH_TOKEN_KEY;
 
         const newUser = {user_id: user._id, username: user.username, email : user.email}
-        const accessToken = jwt.sign(newUser, ACCESS_TOKEN_KEY, {expiresIn: '15s'});
+        const accessToken = jwt.sign(newUser, ACCESS_TOKEN_KEY, {expiresIn: '1h'});
 
-        const refreshToken = jwt.sign(newUser, REFRESH_TOKEN_KEY, {expiresIn: '30s'});
+        const refreshToken = jwt.sign(newUser, REFRESH_TOKEN_KEY, {expiresIn: '7d'});
+
+        user.refreshTokens.push(refreshToken);
+        await user.save();
 
         //successful login
         res.cookie("refreshToken", refreshToken, {
@@ -127,12 +139,24 @@ async function loginController(req, res) {
  */
 async function logoutController(req, res) {
     try{
-        res.clearCooke('jwtToken')
+        // remove refresh token from user profile
+        const email = req.body.email;
+        const refreshToken = req.cookies.refreshToken;
+        
+        const user = await Login.findOne({email : email});
+        if(!user) return res.status({status : "No user found"});
+        console.log({before : user});
 
-        res.json({message: "Logged out Successful"})
+        user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
+        await user.save();
+
+        const newUser = await Login.findOne({email : email});
+        console.log({after : newUser});
+
+        res.json({status: "Logged out Successful"})
     }catch (error){
         console.error(error);
-        res.status(500).json({message: "Internal Server Error"})
+        res.status(500).json({status: "Internal Server Error"})
     }
 }
 
