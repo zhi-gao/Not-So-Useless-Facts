@@ -1,26 +1,37 @@
 /*
-Model for the Facts.
-Title is required and unique. 
-Description is required as well
+    Model for the Facts.
 */
 
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const factModel = new Schema({
-    title:{
+    fact:{
         type: String,
         required: true,
-        unique: true //??
+        unique: true
     },
-    description:{
-        type: String,
-        required: true,
-    },
-    totalRating:{
+    
+    totalUpvotes: {
         type: Number,
-        default: 0
+        required: true,
+    },
+
+    totalDownvotes : {
+        type: Number,
+        required: true
+    },
+
+    comments: {
+        type: [mongoose.Types.ObjectId],
+        required: false
+    },
+
+    sourceFrom : {
+        type : String,
+        required: true
     }
+
 }, {timestamps: true})
 
 module.exports = mongoose.model('Fact', factModel)
