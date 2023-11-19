@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nabar";
 import styles from "./Home.module.css";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import ReportModal from "../components/ReportModal";
@@ -13,9 +13,9 @@ export default function Home() {
     const [showComments, setShowComments] = useState(false);
     const [isFlagged, setIsFlagged] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
-
     const portalContainerRef = useRef(null);
-
+    const [fact, setFact] = useState("");
+    
     const handleFlagClick = () => {
         setIsFlagged(true);
         setShowReportModal(true);
@@ -51,6 +51,23 @@ export default function Home() {
           downvotes: 0 },
     ];
 
+    useEffect(() => {
+        async function fetchFact() {
+            try {
+                const response = await fetch("http://localhost:4000/facts/today");
+                if (response.ok) {
+                    const data = await response.json();
+                    setFact(data.fact);
+                } else {
+                    console.error("Failed to fetch fact");
+                }
+            } catch (error) {
+                console.error("Error fetching fact:", error);
+            }
+        }
+        fetchFact();
+    }, []);
+
     return (
         <div>
             <Navbar 
@@ -66,7 +83,7 @@ export default function Home() {
                 <div id={styles.fotd}>
                     <div><strong>Fact of the Day #1</strong></div>
                     <div>
-                        No matter how hard you try, there will always be an Asian smarter than you
+                        {fact}
                     </div>
                     <div>
                         {/** Upvote Button */}
