@@ -15,6 +15,7 @@ export default function Home() {
     const [showReportModal, setShowReportModal] = useState(false);
     const portalContainerRef = useRef(null);
     const [fact, setFact] = useState("");
+    const [newComment, setNewComment] = useState("");
     
     const handleFlagClick = () => {
         setIsFlagged(true);
@@ -26,6 +27,11 @@ export default function Home() {
         setShowReportModal(false);
     };
 
+    const handleCommentSubmit = () => {
+        console.log("New Comment:", newComment);
+
+        setNewComment("");
+    };
 
     // Comment data
     const comments = [
@@ -51,6 +57,7 @@ export default function Home() {
           downvotes: 0 },
     ];
 
+    {/** Fetch today's fact */}
     useEffect(() => {
         async function fetchFact() {
             try {
@@ -107,6 +114,19 @@ export default function Home() {
                 {/** Comments */}
                 {showComments && (
                     <div className={styles.commentsContainer}>
+                        {/** Add a new comment */}
+                        <div>
+                            <textarea
+                                rows="4"
+                                cols="150"
+                                placeholder="Enter your comment here.."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                            />
+                            <button onClick={handleCommentSubmit}>Submit</button>
+                        </div>
+
+                        {/** Show comments */}
                         <div><strong><h2>Comments</h2></strong></div>
                         {comments.map((comment, index) => (
                             <div key={index}>
@@ -133,7 +153,7 @@ export default function Home() {
                         <ReportModal onClose={handleCloseReportModal} />
                 )}
 
-                {/* Portal container */}
+                {/**  Portal container */}
                 <div ref={portalContainerRef}></div>
             </div>
         </div>
