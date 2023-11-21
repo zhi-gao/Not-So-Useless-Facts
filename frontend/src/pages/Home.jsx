@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nabar";
 import styles from "./Home.module.css";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import ReportModal from "../components/ReportModal";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -11,9 +12,21 @@ export default function Home() {
     const [downvotes, setDownvotes] = useState(0);
     const [showComments, setShowComments] = useState(false);
     const [isFlagged, setIsFlagged] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
+
+    const portalContainerRef = useRef(null);
+
+    const handleFlagClick = () => {
+        setIsFlagged(true);
+        setShowReportModal(true);
+    };
+
+    const handleCloseReportModal = () => {
+        setIsFlagged(false);
+        setShowReportModal(false);
+    };
 
 
-    // TODO modify comments display style
     // Comment data
     const comments = [
         { username: "GeniusJoe88", 
@@ -69,7 +82,7 @@ export default function Home() {
                         <span>{showComments}</span>
 
                         {/** Flag Button */}
-                        <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => setIsFlagged(!isFlagged)} />
+                        <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFlagClick} />
                         <span>{isFlagged}</span>
                     </div>
                 </div>
@@ -90,13 +103,21 @@ export default function Home() {
                                     <FontAwesomeIcon icon={faAnglesDown} onClick={() => {comment.downvotes}} />
                                     <span>{comment.downvotes}</span>
 
-                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => setIsFlagged(!isFlagged)} />
+                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFlagClick} />
                                     <span>{isFlagged}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
+
+                {/** Portal for Report Modal */}
+                {showReportModal && portalContainerRef.current && (
+                        <ReportModal onClose={handleCloseReportModal} />
+                )}
+
+                {/* Portal container */}
+                <div ref={portalContainerRef}></div>
             </div>
         </div>
     );
