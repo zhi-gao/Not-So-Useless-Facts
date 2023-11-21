@@ -13,3 +13,22 @@
     margin-left: 15%;
     margin-right: 15%;
 }
+#fotd > div:last-child {
+    text-align: right;
+}
+#fotd > div:last-child > * {
+    margin-left: 10px;
+}
+
+.commentsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.iconsContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
