@@ -4,27 +4,40 @@ import styles from "./Home.module.css";
 import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import ReportModal from "../components/ReportModal";
+import FactReportModal from "../components/FactReportModal";
+import UserReportModal from "../components/UserReportModal";
 
 export default function Home() {
     const navigate = useNavigate();
     const [upvotes, setUpvotes] = useState(0);
     const [downvotes, setDownvotes] = useState(0);
     const [showComments, setShowComments] = useState(false);
-    const [isFlagged, setIsFlagged] = useState(false);
-    const [showReportModal, setShowReportModal] = useState(false);
+    const [isFactFlagged, setIsFactFlagged] = useState(false);
+    const [showFactReportModal, setShowFactReportModal] = useState(false);
+    const [isUserFlagged, setIsUserFlagged] = useState(false);
+    const [showUserReportModal, setShowUserReportModal] = useState(false);
     const portalContainerRef = useRef(null);
     const [fact, setFact] = useState("");
     const [newComment, setNewComment] = useState("");
     
-    const handleFlagClick = () => {
-        setIsFlagged(true);
-        setShowReportModal(true);
+    const handleFactFlagClick = () => {
+        setIsFactFlagged(true);
+        setShowFactReportModal(true);
     };
 
-    const handleCloseReportModal = () => {
-        setIsFlagged(false);
-        setShowReportModal(false);
+    const handleCloseFactReportModal = () => {
+        setIsFactFlagged(false);
+        setShowFactReportModal(false);
+    };
+
+    const handleUserFlagClick = () => {
+        setIsUserFlagged(true);
+        setShowUserReportModal(true);
+    };
+
+    const handleCloseUserReportModal = () => {
+        setIsUserFlagged(false);
+        setShowUserReportModal(false);
     };
 
     const handleCommentSubmit = () => {
@@ -86,6 +99,7 @@ export default function Home() {
                 thirdButtonOnClick={() => navigate("/about")} 
             />
 
+            {/** Fact */}
             <div className={styles.flexContainer}>
                 <div id={styles.fotd}>
                     <div><strong>Fact of the Day #1</strong></div>
@@ -93,21 +107,21 @@ export default function Home() {
                         {fact}
                     </div>
                     <div>
-                        {/** Upvote Button */}
+                        {/** Upvote Fact Button */}
                         <FontAwesomeIcon icon={faAnglesUp} onClick={() => setUpvotes(upvotes + 1)} />
                         <span>{upvotes}</span>
 
-                        {/** Downvote Button */}
+                        {/** Downvote Fact Button */}
                         <FontAwesomeIcon icon={faAnglesDown} onClick={() => setDownvotes(downvotes + 1)} />
                         <span>{downvotes}</span>
 
-                        {/** Comment Button */}
+                        {/** Comment Fact Button */}
                         <FontAwesomeIcon icon={faCommentDots} onClick={() => setShowComments(!showComments)} />
                         <span>{showComments}</span>
 
-                        {/** Flag Button */}
-                        <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFlagClick} />
-                        <span>{isFlagged}</span>
+                        {/** Flag Fact Button */}
+                        <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFactFlagClick} />
+                        <span>{isFactFlagged}</span>
                     </div>
                 </div>
 
@@ -134,23 +148,31 @@ export default function Home() {
                                     <strong>{comment.username}:</strong> {comment.content}
                                 </div>
                                 <div className={styles.iconsContainer}>
+                                    {/** Upvote Comment Button */}
                                     <FontAwesomeIcon icon={faAnglesUp} onClick={() => {comment.upvotesotes}} />
                                     <span>{comment.upvotes}</span>
 
+                                    {/** Downvote Comment Button */}
                                     <FontAwesomeIcon icon={faAnglesDown} onClick={() => {comment.downvotes}} />
                                     <span>{comment.downvotes}</span>
 
-                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFlagClick} />
-                                    <span>{isFlagged}</span>
+                                    {/** Flag User Button */}
+                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
+                                    <span>{isUserFlagged}</span>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
 
-                {/** Portal for Report Modal */}
-                {showReportModal && portalContainerRef.current && (
-                        <ReportModal onClose={handleCloseReportModal} />
+                {/** Portal for Fact Report Modal */}
+                {showFactReportModal && portalContainerRef.current && (
+                        <FactReportModal onClose={handleCloseFactReportModal} />
+                )}
+
+                {/** Portal for User Report Modal */}
+                {showUserReportModal && portalContainerRef.current && (
+                        <UserReportModal onClose={handleCloseUserReportModal} />
                 )}
 
                 {/**  Portal container */}
