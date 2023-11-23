@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const { initDatabase } = require("./database");
 require("dotenv").config();
 
@@ -10,9 +11,10 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
-    credentials : true,
-    origin : [process.env.DEV_MODE != "production" ? "*" : process.env.FRONTEND_HOST]
+    origin : "http://localhost:5173",
+    credentials : true,    
 }));
 
 app.get("/", (req, res) => res.json({status : "OK"}));
@@ -26,6 +28,3 @@ initDatabase().then(() => {
 }).catch(err => {
     console.error(err);
 });
-
-
-

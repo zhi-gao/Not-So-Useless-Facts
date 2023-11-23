@@ -50,3 +50,14 @@
 .inputContainer {
     margin-bottom: 40px;
 }
+
+.errMsg {
+    text-align: center;
+    margin: 20px;
+    font-size: 25px;
+    border: 1px solid red;
+    padding: 20px;
+    color: white;
+    background-color: red;
+    border-radius: 8px;
+}
