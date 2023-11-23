@@ -11,6 +11,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
 
+// LOGIN CONTROLLERS
+
 async function loginController(req, res) {
     const { username, password } = req.body;
 
@@ -94,67 +96,185 @@ async function registerController(req, res) {
     }
 }
 
+
+// FACTS CONTROLLERS
+
 /**
  * Upvote fact controller
  * Functionality of a user clicking the upvote fact goes here
- * Requires user and fact
+ * Requires userId and factId
  * Steps:
  * find existence of fact
  * find existence of user
  * find if the user already upvoted/downvoted fact
- * if already upvoted, remove from user.upvotecomments, decrement fact.upvote
+ * if already upvoted, remove from user.upvotefact, decrement fact.upvote
+ * if already downvoted, remove from user.downvotefact, add to user.upvotefact, decrement fact.downvote, increment fact.upvote
+ * else add to user.upvotefact, increment fact.upvote
  */
 async function upvoteFactController(req, res) {
-    const {user, fact} = req.body
+    const {userId, factId} = req.body
 
     // Make sure id is mongoose valid
-    if(!mongoose.Types.ObjectId.isValid(user._id)){
+    if(!mongoose.Types.ObjectId.isValid(userId)){
         return res.status(404).json({error: "Id invalid"})
     }
 
-    if(!mongoose.Types.ObjectId.isValid(fact._id)){
+    if(!mongoose.Types.ObjectId.isValid(factId)){
         return res.status(404).json({error: "Id invalid"})
     }
 
     // Find existance of user and fact
-    const exist = await Login.findByID(user._id) || await Fact.findByID(fact._id)
+    const userExist = await Login.findById(userId)
 
-    if(!exist){
+    if(!userExist){
         res.status(404).json({error: "Id does not exist"})
     }
 
+    const factExist = await Fact.findById(factId)
 
-
-    // const newUser = await Login.findOneAndUpdate(
-    //     {_id: userID}, 
-    //     {$addToSet: {upvoteFactController: [fact._id]}}, {new:true}
-    // )
-
-    // check if user exist
-    if(!newUser){
-        return res.status(404).json({error: "Internal Serivce Error"})
+    if(!factExist){
+        res.status(404).json({error: "Id does not exist"})
     }
 
-    // update fact
-    const updatedFact = Fact.findOneAndUpdate(
-        {_id: fact._id},
-        {$inc: {totalrating: 1}}
-    )
+    // if upvoteFact already exist in User.upvoteFacts
+    if(userExist.upvotedFacts.includes(factId)){
+        //remove it from User.upvotedFacts
+        const updatedUser = await Login.findByIdAndUpdate(
+            userId,
+            { $pull: { upvotedFacts: factId } },
+            {new: true}
+        );
 
-    // check if fact exist
-    if(!updatedFact){
-        return res.status(404).json({error: "Internal Service Error"})
+        //decrement Facts.totalUpvotes
+        const updatedFact = await Fact.findByIdAndUpdate(
+            factId,
+            { $inc: { totalUpvotes: -1 } },
+            {new: true}
+        );
+
+        return res.json({ message: '3. Fact Successfully remove upvote', user: updatedUser, fact: updatedFact });
     }
+    //if upvoteFact already exist in User.downvoteFacts
+    if(userExist.downvotedFacts.includes(factId)){
+        //remove it from User.downvotedFacts & add it to User.updatedFacts
+        const updatedUser = await Login.findByIdAndUpdate(
+            userId,
+            { $pull: {downvotedFacts: factId}, $push: {upvotedFacts: factId}},
+            { new: true}
+        )
 
-    res.status(200).json(user)
+        //decrement Facts.totalDownvotes & increment Facts.totalUpvotes
+        const updatedFact = await Fact.findByIdAndUpdate(
+            factId,
+            { $inc: {totalDownvotes: -1, totalUpvotes: 1}},
+            { new: true }
+        )
+
+        return res.json({ message: '2. Fact Successfully upvote from downvote', user: updatedUser, fact: updatedFact });
+    }
+    //if upvotedFact doesnt exist in either, just add and increment
+    const updatedUser = await Login.findByIdAndUpdate(
+        userId,
+        { $push: { upvotedFacts: factId }},
+        { new: true } // move 'new: true' here
+    );
+    
+    const updatedFact = await Fact.findByIdAndUpdate(
+        factId,
+        { $inc: { totalUpvotes: 1 } },
+        { new: true } // move 'new: true' here
+    );
+
+    return res.json({ message: '1. Fact Successfully upvoted', user: updatedUser, fact: updatedFact });
 }
 
 /**
- * Downvote fact controller 
+ * Downvote fact controller
  * Functionality of a user clicking the downvote fact goes here
+ * Requires userId and factId
+ * Steps:
+ * find existence of fact
+ * find existence of user
+ * find if the user already upvoted/downvoted fact
+ * if already downvoted, remove from user.downvote, decrement fact.downvote
+ * if already upvoted, remove from user.upvotefact, add to user.downvotefact, decrement fact.upvote, increment fact.downvote
+ * else add to user.downfact, increment fact.downvote
  */
 async function downvoteFactController(req, res) {
+    const {userId, factId} = req.body
 
+    // Make sure id is mongoose valid
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: "Id invalid"})
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(factId)){
+        return res.status(404).json({error: "Id invalid"})
+    }
+
+    // Find existance of user and fact
+    const userExist = await Login.findById(userId)
+
+    if(!userExist){
+        res.status(404).json({error: "Id does not exist"})
+    }
+
+    const factExist = await Fact.findById(factId)
+
+    if(!factExist){
+        res.status(404).json({error: "Id does not exist"})
+    }
+
+    // if upvoteFact already exist in User.downvotedFact
+    if(userExist.downvotedFacts.includes(factId)){
+        //remove it from User.downvotedFacts
+        const updatedUser = await Login.findByIdAndUpdate(
+            userId,
+            { $pull: { downvotedFacts: factId } },
+            {new: true}
+        );
+
+        //decrement Facts.totalUpvotes
+        const updatedFact = await Fact.findByIdAndUpdate(
+            factId,
+            { $inc: { totalDownvotes: -1 } },
+            {new: true}
+        );
+
+        return res.json({ message: '3. Fact Successfully remove downvote', user: updatedUser, fact: updatedFact });
+    }
+    //if downvoteFact already exist in User.upvoteFacts
+    if(userExist.upvotedFacts.includes(factId)){
+        //remove it from User.downvotedFacts & add it to User.updatedFacts
+        const updatedUser = await Login.findByIdAndUpdate(
+            userId,
+            { $pull: {upvotedFacts: factId}, $push: {downvotedFacts: factId}},
+            { new: true}
+        )
+
+        //decrement Facts.totalDownvotes & increment Facts.totalUpvotes
+        const updatedFact = await Fact.findByIdAndUpdate(
+            factId,
+            { $inc: {totalUpvotes: -1, totalDownvotes: 1}},
+            { new: true }
+        )
+
+        return res.json({ message: '2. Fact Successfully downvote from upvote', user: updatedUser, fact: updatedFact });
+    }
+    //if upvotedFact doesnt exist in either, just add and increment
+    const updatedUser = await Login.findByIdAndUpdate(
+        userId,
+        { $push: { downvotedFacts: factId }},
+        { new: true } // move 'new: true' here
+    );
+    
+    const updatedFact = await Fact.findByIdAndUpdate(
+        factId,
+        { $inc: { totalDownvotes: 1 } },
+        { new: true } // move 'new: true' here
+    );
+
+    return res.json({ message: '1. Fact Successfully downvote', user: updatedUser, fact: updatedFact });
 }
 
 /* 
@@ -176,6 +296,28 @@ async function getFactsController(req, res){
         return res.status(500).json({error: "Internal Server Error"});
     }
 }
+
+/*
+Get a Facts
+Requires: factID
+Steps:
+Get Fact db
+Retrieve info and return them
+*/
+
+/*
+Get All Facts from User
+Requires: User
+Steps:
+Validate and check User Id
+Get Ids from Users upvoteFacts and downvoteFacts
+Find all matching Ids in FactDB
+Return them
+Can have filters and sorts later
+*/
+
+
+// COMMENTS CONTROLLERS
 
 /**
  * Upvote comment controller 
