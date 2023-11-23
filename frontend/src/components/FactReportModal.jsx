@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import styles from "../components/ReportModal.module.css";
 
-const ReportModal = ({ onClose }) => {
+const FactReportModal = ({ onClose }) => {
   const [reportReason, setReportReason] = useState(""); // State to manage selected report reason
   const [details, setDetails] = useState(""); // State to manage input details
 
   const handleReportSubmit = () => {
     // Handle submission logic here, you can send the report data to the server or perform other actions
-    console.log("Report Reason:", reportReason);
+    console.log("Fact Report Reason:", reportReason);
     console.log("Details:", details);
 
     // Close the modal after submitting
@@ -31,9 +31,9 @@ const ReportModal = ({ onClose }) => {
         <input
           type="radio"
           name="reportReason"
-          value="Inaccurate"
-          checked={reportReason === "Inaccurate"}
-          onChange={() => setReportReason("Inaccurate")}
+          value="Inaccurate or has been proven false"
+          checked={reportReason === "Inaccurate or has been proven false"}
+          onChange={() => setReportReason("Inaccurate or has been proven false")}
         />
         Inaccurate or has been proven false
       </label>
@@ -61,4 +61,4 @@ const ReportModal = ({ onClose }) => {
   );
 };
 
-export default ReportModal;
+export default FactReportModal;
