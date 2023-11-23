@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import About from "./pages/About"
 import PastFacts from "./pages/PastFacts"
+import Profile from "./pages/Profile"
 
 function App() {
   return <div>
@@ -14,7 +15,7 @@ function App() {
         <Route exact path='/register' element={<Register />}/>
         <Route exact path='/about' element={<About />}/>
         <Route exact path='/all-facts' element={<PastFacts />}/>
-
+        <Route exact path='/profile' element={<Profile />}/>
       </Routes>
     </BrowserRouter>
   </div>
