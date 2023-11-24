@@ -5,9 +5,11 @@ import Register from './pages/Register'
 import About from "./pages/About"
 import PastFacts from "./pages/PastFacts"
 import Profile from "./pages/Profile"
+import { UserProvider } from "./context/UserContext"
 
 function App() {
   return <div>
+    <UserProvider>
     <BrowserRouter>
       <Routes>
         <Route exact path='/' element={<Home />}/>
@@ -18,6 +20,7 @@ function App() {
         <Route exact path='/profile' element={<Profile />}/>
       </Routes>
     </BrowserRouter>
+    </UserProvider>
   </div>
 }
 
