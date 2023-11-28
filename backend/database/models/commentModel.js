@@ -9,11 +9,11 @@ const Schema = mongoose.Schema
 
 const commentSchema = new Schema ({
     userId:{
-        type : [mongoose.Types.ObjectId],
+        type : mongoose.Types.ObjectId,
         required: true
     },
     factId:{
-        type : [mongoose.Types.ObjectId],
+        type : mongoose.Types.ObjectId,
         required: true
     },
     comment:{
