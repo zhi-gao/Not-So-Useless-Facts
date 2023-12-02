@@ -1,15 +1,45 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 import styles from "./UserLogin.module.css"
 import Navbar from "../components/Nabar";
 import { loginRequest } from "../requests/loginRequest";
+import { UserContext } from "../context/UserContext";
+import { authRequest } from "../requests/authRequest";
 
 export default function Login() {
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
+    const {currentUser, setCurrentUser} = useContext(UserContext);
+    const [isLoading, setLoading] = useState(true);
 
     const emailRef = useRef();
     const passwordRef = useRef();
+
+    useEffect(() => {
+        const auth = async () => {
+            if(!localStorage.getItem("token")) {
+                setLoading(false);
+                return;
+            }
+
+            if(JSON.stringify(currentUser) === "{}") {
+                try {
+                    // make auth request
+                    const data = await authRequest();
+                    setCurrentUser(data);
+                    navigate("/profile");
+                } catch (err) {
+                    setLoading(false);
+                }
+            }
+
+            else {
+                navigate("/profile");
+            }
+        }
+
+        auth();
+    }, []);
 
     async function submitHandler(e) {
         e.preventDefault();
@@ -34,11 +64,18 @@ export default function Login() {
 
             console.log(data);
             localStorage.setItem("token", data.accessToken);
+            setCurrentUser(data);
             navigate("/profile");
         } catch (err) {
             console.error(err);
             setErrorMessage("Internal Server Error");
         }
+    }
+
+    if(isLoading) {
+        return <div>
+            Loading...
+        </div>
     }
 
     return <div>
