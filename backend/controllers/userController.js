@@ -8,7 +8,8 @@ const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
-const { findUserWithEmail } = require('../database/fetch')
+const { findUserWithEmail, userExists } = require('../database/fetch')
+const { insertUser } = require('../database/insert')
 
 async function authController(req, res) {
     // get access token
@@ -145,15 +146,11 @@ async function logoutController(req, res) {
         const email = req.body.email;
         const refreshToken = req.cookies.refreshToken;
         
-        const user = await Login.findOne({email : email});
+        const user = await findUserWithEmail(email);
         if(!user) return res.status({status : "No user found"});
-        console.log({before : user});
 
         user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
         await user.save();
-
-        const newUser = await Login.findOne({email : email});
-        console.log({after : newUser});
 
         res.json({status: "Logged out Successful"})
     }catch (error){
@@ -169,16 +166,10 @@ async function logoutController(req, res) {
 async function registerController(req, res) {
     const {username, password, email} = req.body
 
-    const usernameExist = await Login.exists({username: {$regex: new RegExp(username, 'i')}});
+    const exist = await userExists(username, email);
 
-    if(usernameExist){
+    if(exist){
         return res.status(400).json({message: "Username already exist"})
-    }
-
-    const emailExist = await Login.exists({email: {$regex: new RegExp(email, 'i')}});
-
-    if(emailExist){
-        return res.status(400).json({message: "Email already exist"})
     }
 
     try{
@@ -186,7 +177,7 @@ async function registerController(req, res) {
         const salt = await bcrypt.genSalt(SALT_ROUNDS)
         const hashedPassword = await bcrypt.hash(password, salt)
 
-        await Login.create({username, hashedPassword, email});
+        await insertUser(username, email, hashedPassword);
 
         res.json({message: "User registration successful"})
     } catch (err) {

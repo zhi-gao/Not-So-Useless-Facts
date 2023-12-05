@@ -1,4 +1,5 @@
 const Facts = require("./models/factModel");
+const Login = require("./models/loginModel");
 
 async function insertFact(fact, source) {
     try {
@@ -18,6 +19,15 @@ async function insertFact(fact, source) {
     }
 }
 
+async function insertUser(username, email, password) {
+    try {
+        await Login.create({username, hashedPassword : password, email});
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
-    insertFact
+    insertFact,
+    insertUser,
 }

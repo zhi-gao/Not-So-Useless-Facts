@@ -21,7 +21,27 @@ async function findUserWithEmail(email) {
     }
 }
 
+async function userExists(username, email) {
+    try {
+        const usernameExist = await Login.exists({username: {$regex: new RegExp(username, 'i')}});
+        if(usernameExist) {
+            return true;
+        }
+
+        const emailExist = await Login.exists({email: {$regex: new RegExp(email, 'i')}});
+        if(emailExist) {
+            return true;
+        }
+
+        return false;
+
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
     fetchLatestFact,
-    findUserWithEmail
+    findUserWithEmail,
+    userExists,
 }
