@@ -1,4 +1,5 @@
 const Facts = require("./models/factModel");
+const Login = require("./models/loginModel");
 
 async function insertFact(fact, source) {
     try {
@@ -11,7 +12,6 @@ async function insertFact(fact, source) {
             createdAt : new Date().toDateString()
         });
 
-        const data = await Facts.find({fact : fact});
     } catch (err) {
         console.error(`An error has occurred while inserting a new fact`);
         console.error(err);
@@ -19,6 +19,15 @@ async function insertFact(fact, source) {
     }
 }
 
+async function insertUser(username, email, password) {
+    try {
+        await Login.create({username, hashedPassword : password, email});
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
-    insertFact
+    insertFact,
+    insertUser,
 }

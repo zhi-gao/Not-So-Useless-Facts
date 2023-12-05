@@ -1,4 +1,5 @@
 const Facts = require("./models/factModel")
+const Login = require("./models/loginModel");
 
 async function fetchLatestFact() {
     try {
@@ -11,6 +12,36 @@ async function fetchLatestFact() {
     }
 }
 
+async function findUserWithEmail(email) {
+    try {
+        const user = await Login.findOne({email : email});
+        return user;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function userExists(username, email) {
+    try {
+        const usernameExist = await Login.exists({username: {$regex: new RegExp(username, 'i')}});
+        if(usernameExist) {
+            return true;
+        }
+
+        const emailExist = await Login.exists({email: {$regex: new RegExp(email, 'i')}});
+        if(emailExist) {
+            return true;
+        }
+
+        return false;
+
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
     fetchLatestFact,
+    findUserWithEmail,
+    userExists,
 }

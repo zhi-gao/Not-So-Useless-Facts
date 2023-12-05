@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom"
 import styles from "./UserLogin.module.css"
 import Navbar from "../components/Nabar";
+import { registerRequest } from "../requests/registerRequest";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -41,6 +42,12 @@ export default function Register() {
         const passwordRegex = new RegExp("^(?=.*[0-9])(.{9,})$");
 
         // make request
+        try {
+            await registerRequest(username, email, password);
+            navigate("/login");
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return <div>
