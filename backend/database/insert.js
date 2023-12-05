@@ -11,7 +11,6 @@ async function insertFact(fact, source) {
             createdAt : new Date().toDateString()
         });
 
-        const data = await Facts.find({fact : fact});
     } catch (err) {
         console.error(`An error has occurred while inserting a new fact`);
         console.error(err);

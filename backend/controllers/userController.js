@@ -8,6 +8,7 @@ const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
+const { findUserWithEmail } = require('../database/fetch')
 
 async function authController(req, res) {
     // get access token
@@ -91,7 +92,7 @@ async function loginController(req, res) {
     const { email, password } = req.body;
 
     try{
-        const user = await (Login.findOne({email}))
+        const user = await findUserWithEmail(email);
 
         // check if user exist
         if(!user){

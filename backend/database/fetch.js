@@ -1,4 +1,5 @@
 const Facts = require("./models/factModel")
+const Login = require("./models/loginModel");
 
 async function fetchLatestFact() {
     try {
@@ -11,6 +12,16 @@ async function fetchLatestFact() {
     }
 }
 
+async function findUserWithEmail(email) {
+    try {
+        const user = await Login.findOne({email : email});
+        return user;
+    } catch (err) {
+        throw err;
+    }
+}
+
 module.exports = {
     fetchLatestFact,
+    findUserWithEmail
 }
