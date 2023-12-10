@@ -4,7 +4,7 @@
 */
 const Login = require('../database/models/loginModel')
 const Fact = require('../database/models/factModel')
-const Rating = require('../database/models/ratingModel')
+// const Rating = require('../database/models/ratingModel')
 const Comment = require('../database/models/commentModel')
 const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
@@ -91,89 +91,6 @@ async function registerController(req, res) {
         res.status(200).json({message: "User registration successful", user: newUser})
     } catch (err) {
         console.error("Error during registration: ", err);
-    }
-}
-
-/**
- * Upvote fact controller
- * Functionality of a user clicking the upvote fact goes here
- * Requires user and fact
- * Steps:
- * find existence of fact
- * find existence of user
- * find if the user already upvoted/downvoted fact
- * if already upvoted, remove from user.upvotecomments, decrement fact.upvote
- */
-async function upvoteFactController(req, res) {
-    const {user, fact} = req.body
-
-    // Make sure id is mongoose valid
-    if(!mongoose.Types.ObjectId.isValid(user._id)){
-        return res.status(404).json({error: "Id invalid"})
-    }
-
-    if(!mongoose.Types.ObjectId.isValid(fact._id)){
-        return res.status(404).json({error: "Id invalid"})
-    }
-
-    // Find existance of user and fact
-    const exist = await Login.findByID(user._id) || await Fact.findByID(fact._id)
-
-    if(!exist){
-        res.status(404).json({error: "Id does not exist"})
-    }
-
-
-
-    // const newUser = await Login.findOneAndUpdate(
-    //     {_id: userID}, 
-    //     {$addToSet: {upvoteFactController: [fact._id]}}, {new:true}
-    // )
-
-    // check if user exist
-    if(!newUser){
-        return res.status(404).json({error: "Internal Serivce Error"})
-    }
-
-    // update fact
-    const updatedFact = Fact.findOneAndUpdate(
-        {_id: fact._id},
-        {$inc: {totalrating: 1}}
-    )
-
-    // check if fact exist
-    if(!updatedFact){
-        return res.status(404).json({error: "Internal Service Error"})
-    }
-
-    res.status(200).json(user)
-}
-
-/**
- * Downvote fact controller 
- * Functionality of a user clicking the downvote fact goes here
- */
-async function downvoteFactController(req, res) {
-
-}
-
-/* 
-Get All Facts
-Requires: nothing
-Steps:
-Get Facts db
-Retrieve info and return them
-Can have filters and sorts later
-*/
-
-async function getFactsController(req, res){
-    try{
-        const facts = await Fact.find(); //add filters/sorts here
-
-        return res.status(200).json(facts)
-    } catch (err){
-        console.error(err)
-        return res.status(500).json({error: "Internal Server Error"});
     }
 }
 
@@ -299,11 +216,8 @@ module.exports = {
     loginController,
     logoutController,
     registerController,
-    upvoteFactController,
     upvoteCommentController,
-    downvoteFactController,
     downvoteCommentController,
     postCommentController,
-    getFactsController,
     getCommentsController,
 }
