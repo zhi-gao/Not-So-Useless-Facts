@@ -118,13 +118,13 @@ export default function Home() {
     return <div>
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
-        <div className={styles.flexContainer}>
-            <div id={styles.fotd}>
-                <div><strong>Fact of the Day #1</strong></div>
-                <div>
+        <div className={`${styles.flexContainer} ${styles.factSection}`}>
+            <div>
+                <div className={styles.factTitle}>Fact of the Day #1</div>
+                <div className={styles.factContent}>
                     {fact}
                 </div>
-                <div>
+                <div className={styles.iconsRow}>
                     {/** Upvote Fact Button */}
                     <FontAwesomeIcon icon={faAnglesUp} onClick={() => setUpvotes(upvotes + 1)} />
                     <span>{upvotes}</span>
