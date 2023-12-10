@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nabar";
-import styles from "./Home.module.css";
+import styles from "./PastFacts.module.css";
 import React, { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -134,11 +134,11 @@ export default function PastFacts() {
                 thirdButtonOnClick={() => navigate("/about")} 
             />
 
-            <div className={styles.flexContainer}>
-                <div className={styles.factsContainer}>
-                    <h1>Past Facts</h1>
+            <div className={`${styles.flexContainer} ${styles.factSection}`}>
+                <div>
+                <div className={styles.factTitle}>Past Facts</div>
 
-                    <div className={styles.sortOptions}>
+                    <div className={styles.sortRow}>
                         <label>
                             Sort by:
                             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
@@ -149,10 +149,10 @@ export default function PastFacts() {
                     </div>
 
                     {pastFacts.map((fact) => (
-                        <div key={fact._id} className={styles.fact}>
+                        <div key={fact._id} className={styles.factContent}>
                             Did you know: {fact.fact}
                             
-                            <div>
+                            <div className={styles.iconsRow}>
                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => handleUpvote(fact._id)} />
                                 <span>{fact.upvotes}</span>
 
