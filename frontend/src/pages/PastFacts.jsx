@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nabar";
 import styles from "./PastFacts.module.css";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
+import { UserContext } from "../context/UserContext";
+import { authRequest } from "../requests/authRequest";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import FactReportModal from "../components/FactReportModal";
@@ -9,6 +11,8 @@ import UserReportModal from "../components/UserReportModal";
 
 export default function PastFacts() {
     const navigate = useNavigate();
+    const {currentUser, setCurrentUser} = useContext(UserContext);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [pastFacts, setPastFacts] = useState([]);
     const [sortBy, setSortBy] = useState('latest'); // 'latest' or 'oldest'
     const portalContainerRef = useRef(null);
@@ -20,6 +24,23 @@ export default function PastFacts() {
     const [showUserReportModal, setShowUserReportModal] = useState(false);
 
     useEffect(() => {
+        const auth = async () => {
+            if(!localStorage.getItem("token")) {
+                return;
+            }
+
+            if(JSON.stringify(currentUser) === "{}") {
+                try {
+                    // make auth request
+                    const data = await authRequest();
+                    setCurrentUser(data);
+                    setIsUserLoggedIn(true);
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        }
+
         async function fetchPastFacts() {
             try {
                 const response = await fetch('http://localhost:4000/facts');
@@ -56,7 +77,13 @@ export default function PastFacts() {
                 console.error('Error fetching past facts:', error);
             }
         }
-        fetchPastFacts();
+
+        async function helper() {
+            await fetchPastFacts();
+            await auth();
+        }
+
+        helper();
     }, [sortBy]);
 
     const handleSortChange = (value) => {
@@ -125,15 +152,7 @@ export default function PastFacts() {
 
     return (
         <div>
-            <Navbar
-                primaryButton="Login"
-                primaryButtonOnClick={() => navigate('/login')}
-                secondaryButton="Home"
-                secondaryButtonOnClick={() => navigate('/')}
-                thirdButton="About Us" 
-                thirdButtonOnClick={() => navigate("/about")} 
-            />
-
+            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>
@@ -163,7 +182,7 @@ export default function PastFacts() {
                                 <span>{fact.comments.length}</span>
 
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleFactFlagClick(fact._id)} />
-                                <span>{isFactFlagged}</span>
+                                <span>{isFactFlagged}Flag</span>
                             </div>
 
                             {factComments[fact._id] && (
@@ -192,7 +211,7 @@ export default function PastFacts() {
                                                 <span>{comment.downvotes}</span>
 
                                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
-                                                <span>{isUserFlagged}</span>
+                                                <span>{isUserFlagged}Flag</span>
                                             </div>
                                         </div>
                                     ))}

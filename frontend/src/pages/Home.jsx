@@ -135,11 +135,11 @@ export default function Home() {
 
                     {/** Comment Fact Button */}
                     <FontAwesomeIcon icon={faCommentDots} onClick={() => setShowComments(!showComments)} />
-                    <span>{showComments}</span>
+                    <span>{comments.length}</span>
 
                     {/** Flag Fact Button */}
                     <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFactFlagClick} />
-                    <span>{isFactFlagged}</span>
+                    <span>{isFactFlagged}Flag</span>
                 </div>
             </div>
 
@@ -176,7 +176,7 @@ export default function Home() {
 
                                 {/** Flag User Button */}
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
-                                <span>{isUserFlagged}</span>
+                                <span>{isUserFlagged}Flag</span>
                             </div>
                         </div>
                     ))}
