@@ -150,6 +150,10 @@ export default function PastFacts() {
         }));
     };
 
+    const handleUserClick = (username) => {
+        navigate(`/profile/${username}`);
+    };
+
     return (
         <div>
             {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
@@ -201,7 +205,11 @@ export default function PastFacts() {
                                     {fact.comments.map((comment, index) => (
                                         <div key={index}>
                                             <div>
-                                                <strong>{comment.username}:</strong> {comment.content}
+                                                <strong>
+                                                    <a href="#" onClick={() => handleUserClick(comment.username)}>
+                                                        {comment.username}
+                                                    </a>
+                                                </strong>: {comment.content}
                                             </div>
                                             <div>
                                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {}} />

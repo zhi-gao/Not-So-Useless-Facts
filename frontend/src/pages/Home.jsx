@@ -21,6 +21,7 @@ export default function Home() {
     const [isUserFlagged, setIsUserFlagged] = useState(false);
     const [showUserReportModal, setShowUserReportModal] = useState(false);
     const portalContainerRef = useRef(null);
+
     // Comment data
     const comments = [
         { username: "GeniusJoe88", 
@@ -115,6 +116,10 @@ export default function Home() {
         setNewComment("");
     };
 
+    const handleUserClick = (username) => {
+        navigate(`/profile/${username}`);
+    };
+
     return <div>
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
@@ -163,7 +168,11 @@ export default function Home() {
                     {comments.map((comment, index) => (
                         <div key={index}>
                             <div>
-                                <strong>{comment.username}:</strong> {comment.content}
+                                <strong>
+                                    <a href="#" onClick={() => handleUserClick(comment.username)}>
+                                        {comment.username}
+                                    </a>
+                                </strong>: {comment.content}
                             </div>
                             <div className={styles.iconsContainer}>
                                 {/** Upvote Comment Button */}
