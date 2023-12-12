@@ -22,17 +22,13 @@ const ratingSchema = new Schema({
         type : [mongoose.Types.ObjectId],
         required: true
     },
+    rated: {
+        type: Boolean,
+        required: true
+    },
     rating:{
-        type: Number,
-        require: true, 
-        default: 0,
-        validate: {
-            validator: function (value){
-                // Rating is either -1 (downvote), 0 (no rating), or 1(upvote)
-                return [-1, 0, 1].include(value);
-            },
-            message: 'Rating must be -1, 0, 1'
-        }
+        type: Boolean,
+        required: false
     }
 }, {timestamps: true})
 

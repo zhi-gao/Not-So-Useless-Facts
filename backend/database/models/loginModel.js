@@ -25,16 +25,6 @@ const loginSchema = new Schema({
         required: true
     },
 
-    upvotedFacts : {
-        type : [mongoose.Types.ObjectId],
-        required : false,        
-    },
-
-    downvotedFacts : {
-        type : [mongoose.Types.ObjectId],
-        required : false,        
-    },
-
     upvotedComments : {
         type : [mongoose.Types.ObjectId],
         required : false,

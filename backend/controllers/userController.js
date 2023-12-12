@@ -182,6 +182,25 @@ async function registerController(req, res) {
     }
 }
 
+/*
+Get a Facts
+Requires: factID
+Steps:
+Get Fact db
+Retrieve info and return them
+*/
+
+/*
+Get All Facts from User
+Requires: User
+Steps:
+Validate and check User Id
+Get Ids from Users upvoteFacts and downvoteFacts
+Find all matching Ids in FactDB
+Return them
+Can have filters and sorts later
+*/
+
 
 // COMMENTS CONTROLLERS
 
