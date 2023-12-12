@@ -23,6 +23,7 @@ export default function Home() {
     const [isUserFlagged, setIsUserFlagged] = useState(false);
     const [showUserReportModal, setShowUserReportModal] = useState(false);
     const portalContainerRef = useRef(null);
+
     // Comment data
     const comments = [
         { username: "GeniusJoe88", 
@@ -128,17 +129,20 @@ export default function Home() {
             console.error(err);
         }
     }
+    const handleUserClick = (username) => {
+        navigate(`/profile/${username}`);
+    };
 
     return <div>
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
-        <div className={styles.flexContainer}>
-            <div id={styles.fotd}>
-                <div><strong>Fact of the Day #1</strong></div>
-                <div>
-                    {fact.fact}
+        <div className={`${styles.flexContainer} ${styles.factSection}`}>
+            <div>
+                <div className={styles.factTitle}>Fact of the Day #1</div>
+                <div className={styles.factContent}>
+                    {fact}
                 </div>
-                <div>
+                <div className={styles.iconsRow}>
                     {/** Upvote Fact Button */}
                     <FontAwesomeIcon icon={faAnglesUp} onClick={() => factUpvoteHandler(fact)} />
                     <span>{upvotes}</span>
@@ -149,11 +153,11 @@ export default function Home() {
 
                     {/** Comment Fact Button */}
                     <FontAwesomeIcon icon={faCommentDots} onClick={() => setShowComments(!showComments)} />
-                    <span>{showComments}</span>
+                    <span>{comments.length}</span>
 
                     {/** Flag Fact Button */}
                     <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleFactFlagClick} />
-                    <span>{isFactFlagged}</span>
+                    <span>{isFactFlagged}Flag</span>
                 </div>
             </div>
 
@@ -177,7 +181,11 @@ export default function Home() {
                     {comments.map((comment, index) => (
                         <div key={index}>
                             <div>
-                                <strong>{comment.username}:</strong> {comment.content}
+                                <strong>
+                                    <a href="#" onClick={() => handleUserClick(comment.username)}>
+                                        {comment.username}
+                                    </a>
+                                </strong>: {comment.content}
                             </div>
                             <div className={styles.iconsContainer}>
                                 {/** Upvote Comment Button */}
@@ -190,7 +198,7 @@ export default function Home() {
 
                                 {/** Flag User Button */}
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
-                                <span>{isUserFlagged}</span>
+                                <span>{isUserFlagged}Flag</span>
                             </div>
                         </div>
                     ))}

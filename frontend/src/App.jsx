@@ -5,6 +5,7 @@ import Register from './pages/Register'
 import About from "./pages/About"
 import PastFacts from "./pages/PastFacts"
 import Profile from "./pages/Profile"
+import ProfilePage from './pages/ProfilePage'; 
 import { UserProvider } from "./context/UserContext"
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route exact path='/about' element={<About />}/>
         <Route exact path='/all-facts' element={<PastFacts />}/>
         <Route exact path='/profile' element={<Profile />}/>
+        <Route path="/profile/:username" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
     </UserProvider>
