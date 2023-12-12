@@ -17,6 +17,7 @@ export default function Home() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [upvotes, setUpvotes] = useState(0);
     const [downvotes, setDownvotes] = useState(0);
+    const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [isFactFlagged, setIsFactFlagged] = useState(false);
     const [showFactReportModal, setShowFactReportModal] = useState(false);
@@ -24,30 +25,6 @@ export default function Home() {
     const [showUserReportModal, setShowUserReportModal] = useState(false);
     const portalContainerRef = useRef(null);
 
-    // Comment data
-    const comments = [
-        { username: "GeniusJoe88", 
-          content: "This fact is intriguing, showcasing the diverse talents and wisdom within the Asian community. It's essential to encourage and respect the unique abilities of every individual.",
-          upvotes: 5,
-          downvotes: 2},
-        { username: "SmartyPants23", 
-          content: "This serves as a reminder to respect intelligence irrespective of racial boundaries. Let's strive together to create a more inclusive and equitable society.",
-          upvotes: 3,
-          downvotes: 1 },
-        { username: "IQMaster99", 
-          content: "This fact reflects the rich intelligence found across different cultures and ethnicities. Let's cherish and collectively embrace the valuable richness brought by this diversity.",
-          upvotes: 4,
-          downvotes: 2 },
-        { username: "BrainyBella", 
-          content: "This fact is inspiring, reminding us that intelligence and talent know no racial bounds. Let's work together to foster equality and diverse growth.",
-          upvotes: 2,
-          downvotes: 0 },
-        { username: "EinsteinWannabe", 
-          content: "This fact is invigorating as it showcases the abundant intelligence across diverse backgrounds globally. Let's learn from each other and progress together.",
-          upvotes: 0,
-          downvotes: 0 },
-    ];
-    
     {/** Fetch today's fact */}
     const [fact, setFact] = useState({});
     const [newComment, setNewComment] = useState("");
@@ -74,6 +51,12 @@ export default function Home() {
             try {
                 const response = await axios.get("http://localhost:4000/facts/today");
                 const data = response.data;
+
+                // Update the state with fetched upvote, downvote and comment counts
+                setUpvotes(data.fact.totalUpvotes);
+                setDownvotes(data.fact.totalDownvotes);
+                setComments(data.fact.comments);
+
                 setFact(data.fact);
             } catch (error) {
                 console.error("Error fetching fact:", error);

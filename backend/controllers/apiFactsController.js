@@ -60,7 +60,7 @@ async function factOfTheDayController(_, res) {
 /**
  * Upvote fact controller
  * Functionality of a user clicking the upvote fact goes here
- * Requires user id and fact id
+ * Requires userId and factId
  * Steps:
  * find existence of fact
  * find existence of user
@@ -272,7 +272,6 @@ Find all matching Ids in FactDB
 Return them
 Can have filters and sorts later
 */
-
 
 module.exports = {
     factOfTheDayController,
