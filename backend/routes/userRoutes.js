@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/userController");
-// const factController = require("../controllers/apiFactsController")
+const controller = require("../controllers/userController");
 
-router.post("/user/login", userController.loginController);
-router.post("/user/logout", userController.logoutController);
-router.post("/user/register", userController.registerController);
+router.post("/user/login", controller.loginController);
+router.post("/user/logout", controller.logoutController);
+router.post("/user/register", controller.registerController);
 
-router.post("/user/auth", userController.authController);
+router.post("/user/auth", controller.authController);
 
-router.post("/comments/c", userController.postCommentController);
-router.get("/comments", userController.getCommentsController);
+router.post("/comments/c", controller.postCommentController);
+router.get("/comments", controller.getCommentsController);
 
 module.exports = router;
