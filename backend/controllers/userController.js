@@ -205,11 +205,11 @@ async function upvoteFactController(req, res) {
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){
-        return res.status(404).json({error: "Id invalid"})
+        return res.status(404).json({error: "User Id invalid"})
     }
 
     if(!mongoose.Types.ObjectId.isValid(factId)){
-        return res.status(404).json({error: "Id invalid"})
+        return res.status(404).json({error: "Fact Id invalid"})
     }
 
     // Find existance of user and fact

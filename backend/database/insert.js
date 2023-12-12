@@ -12,6 +12,9 @@ async function insertFact(fact, source) {
             createdAt : new Date().toDateString()
         });
 
+        const addedFact = await Facts.findOne({fact : fact});
+        return addedFact;
+
     } catch (err) {
         console.error(`An error has occurred while inserting a new fact`);
         console.error(err);

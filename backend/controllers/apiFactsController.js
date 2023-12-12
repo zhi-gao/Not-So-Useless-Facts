@@ -13,7 +13,7 @@ async function factOfTheDayController(_, res) {
 
     // daily fact found and is already in db
     if(latestFact && new Date(currentDate).getTime() == new Date(latestFact.createdAt).getTime()) {
-        return res.json({status : "OK", fact : latestFact.fact, sourcedFrom: `${latestFact.sourceFrom} cached`});
+        return res.json({status : "OK", fact : latestFact, sourcedFrom: `${latestFact.sourceFrom} cached`});
     }
 
     // cannot find a fact in db
@@ -31,9 +31,9 @@ async function factOfTheDayController(_, res) {
         if(!fact) return res.status(500).json({status : "Fact was not retrived"});
 
         // make a entry into the db
-        await insertFact(fact, "api-ninja");
+        const addedFacts = await insertFact(fact, "api-ninja");
 
-        return res.json({status : "OK", fact, sourcedFrom: "api-ninja"});
+        return res.json({status : "OK", fact : addedFacts, sourcedFrom: "api-ninja"});
     } catch (err) {
         console.error(err);
         
@@ -48,9 +48,9 @@ async function factOfTheDayController(_, res) {
         if(!fact) return res.status(500).json({status : "Fact was not retrived"});
     
         // make a entry into the db
-        insertFact(fact, "useless-facts")
+        const addedFacts = await insertFact(fact, "useless-facts")
 
-        return res.json({status : "OK", fact, sourcedFrom : "useless-facts"});    
+        return res.json({status : "OK", fact : addedFacts, sourcedFrom : "useless-facts"});    
     }
 }
 
