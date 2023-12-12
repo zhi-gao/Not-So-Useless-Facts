@@ -1,3 +1,4 @@
+const Comment = require("./models/commentModel")
 const Fact = require("./models/factModel")
 const Login = require("./models/loginModel");
 
@@ -83,7 +84,7 @@ async function findFactById(factId) {
 
 async function findCommentsByIds(commentIds) {
     try {
-        const comments = await Comment.find({_id: {$in: commentIDs }});
+        const comments = await Comment.find({_id: {$in: commentIds }});
         return comments;
     } catch (err) {
         throw err;

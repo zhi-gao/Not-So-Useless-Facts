@@ -274,7 +274,7 @@ async function getCommentsController(req, res){
 
         // get all comments based on id
         const comments = await findCommentsByIds(commentIDs);
-
+        
         // return comments
         return res.json(comments)
     } catch (error){
