@@ -53,23 +53,42 @@ export default function PastFacts() {
                         const factDate = new Date(fact.createdAt).toLocaleDateString();
                         return factDate !== today;
                     });
-    
-                    if (sortBy === 'latest') {
-                        data = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                    } else if (sortBy === 'oldest') {
-                        data = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                    }
                     
-                    data = data.map((fact) => ({
+                    // Update each fact with totalUpvotes and totalDownvotes from the fetched JSON
+                    const updatedFacts = data.map(fact => ({
                         ...fact,
-                        upvotes: 0,
-                        downvotes: 0,
-                        comments: [],
-                        isFactFlagged: false,
-                        isUserFlagged: false,
+                        upvotes: fact.totalUpvotes,
+                        downvotes: fact.totalDownvotes,
+                        commentCount: fact.comments.length,
                     }));
+
+                    // Sort the facts based on the selected sorting option
+                    switch (sortBy) {
+                        case 'latest':
+                            // Sorting by latest
+                            updatedFacts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                            break;
+                        case 'oldest':
+                            // Sorting by oldest
+                            updatedFacts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                            break;
+                        case 'most_upvoted':
+                            // Sorting by most upvoted
+                            updatedFacts.sort((a, b) => b.upvotes - a.upvotes);
+                            break;
+                        case 'most_downvoted':
+                            // Sorting by most downvoted
+                            updatedFacts.sort((a, b) => b.downvotes - a.downvotes);
+                            break;
+                        case 'most_commented':
+                            // Sorting by most commented
+                            updatedFacts.sort((a, b) => b.commentCount - a.commentCount);
+                            break;
+                        default:
+                            break;
+                    }
     
-                    setPastFacts(data);
+                    setPastFacts(updatedFacts);
                 } else {
                     console.error('Failed to fetch past facts');
                 }
@@ -167,6 +186,9 @@ export default function PastFacts() {
                             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
                                 <option value="latest">Latest</option>
                                 <option value="oldest">Oldest</option>
+                                <option value="most_upvoted">Most Upvoted</option>
+                                <option value="most_downvoted">Most Downvoted</option>
+                                <option value="most_commented">Most Commented</option>
                             </select>
                         </label>
                     </div>
