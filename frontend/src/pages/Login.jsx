@@ -1,29 +1,81 @@
-import { useRef } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom"
 import styles from "./UserLogin.module.css"
 import Navbar from "../components/Nabar";
+import { loginRequest } from "../requests/loginRequest";
+import { UserContext } from "../context/UserContext";
+import { authRequest } from "../requests/authRequest";
 
 export default function Login() {
     const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState("");
+    const {currentUser, setCurrentUser} = useContext(UserContext);
+    const [isLoading, setLoading] = useState(true);
 
     const emailRef = useRef();
     const passwordRef = useRef();
 
+    useEffect(() => {
+        const auth = async () => {
+            if(!localStorage.getItem("token")) {
+                setLoading(false);
+                return;
+            }
+
+            if(JSON.stringify(currentUser) === "{}") {
+                try {
+                    // make auth request
+                    const data = await authRequest();
+                    setCurrentUser(data);
+                    navigate("/profile");
+                } catch (err) {
+                    setLoading(false);
+                }
+            }
+
+            else {
+                navigate("/profile");
+            }
+        }
+
+        auth();
+    }, []);
+
     async function submitHandler(e) {
         e.preventDefault();
+        setErrorMessage("");
 
         const email = emailRef.current?.value || "";
         const password = passwordRef.current?.value || "";
 
         if(!email) {
-
+            setErrorMessage("Email cannot be empty");
+            return;
         }
 
         if(!password) {
-
+            setErrorMessage("Password cannot be empty");
+            return;
         }
 
         // make request
+        try {
+            const data = await loginRequest(email, password);
+
+            console.log(data);
+            localStorage.setItem("token", data.accessToken);
+            setCurrentUser(data);
+            navigate("/profile");
+        } catch (err) {
+            console.error(err);
+            setErrorMessage("Internal Server Error");
+        }
+    }
+
+    if(isLoading) {
+        return <div>
+            Loading...
+        </div>
     }
 
     return <div>
@@ -33,10 +85,11 @@ export default function Login() {
 
         <div className={styles.flexContainer}>
             <form onSubmit={submitHandler} className={styles.container}>
+                {errorMessage && <div className={styles.errMsg}>{errorMessage}</div>}
                 <h1>Login</h1>
                 <div className={styles.inputContainer}>
                     <label>Email:</label>
-                    <input ref={emailRef} /><br></br>
+                    <input ref={emailRef} type="email" /><br></br>
                 </div>
 
                 <div className={styles.inputContainer}>

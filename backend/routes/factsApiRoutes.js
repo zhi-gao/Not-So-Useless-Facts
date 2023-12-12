@@ -4,4 +4,8 @@ const controller = require("../controllers/apiFactsController");
 
 router.get("/facts/today", controller.factOfTheDayController);
 
+router.get("/facts", controller.getFactsController);
+router.post("/facts/upvote", controller.upvoteFactController)
+router.post("/facts/downvote", controller.downvoteFactController)
+
 module.exports = router;

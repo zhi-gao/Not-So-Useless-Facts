@@ -45,10 +45,25 @@ const loginSchema = new Schema({
         required : false,
     },
 
+    upvotedFacts : {
+        type : [mongoose.Types.ObjectId],
+        required : false,
+    },
+
+    downvotedFacts : {
+        type : [mongoose.Types.ObjectId],
+        required : false,
+    },
+
     comments : {
         type : [mongoose.Types.ObjectId],
         required : false,
     },
+
+    refreshTokens : {
+        type : [String],
+        required : false,
+    }
 }, {timestamps: true})
 
 module.exports = mongoose.model('Login', loginSchema)

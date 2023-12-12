@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.content {
+    text-align: center;
+}
+
+.buttons button {
+    margin-right: 10px;
+}
+
+.buttons {
+    margin-top: 20px;
+    gap: 10px;
+}
