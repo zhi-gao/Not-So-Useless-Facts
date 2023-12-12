@@ -1,5 +1,4 @@
 const axios = require("axios");
-const { default: mongoose } = require('mongoose');
 const { insertFact, fetchLatestFact} = require("../database");
 const { findUserById, findFactById, fetchAllFacts } = require("../database/fetch");
 const { insertUpvoteFact, insertDownvoteFact } = require("../database/insert");
@@ -65,213 +64,85 @@ async function factOfTheDayController(_, res) {
  * find existence of fact
  * find existence of user
  * find if the user already upvoted/downvoted fact
- * if already upvoted, remove from user.upvotecomments, decrement fact.upvote
+ * if already upvoted, remove from user.upvotefact, decrement fact.upvote
+ * if already downvoted, remove from user.downvotefact, add to user.upvotefact, decrement fact.downvote, increment fact.upvote
+ * else add to user.upvotefact, increment fact.upvote
  */
 async function upvoteFactController(req, res) {
-    const {userID, factID} = req.body
+    const {userId, factId} = req.body
 
     // Make sure id is mongoose valid
-    if(!mongoose.Types.ObjectId.isValid(userID)){
+    if(!mongoose.Types.ObjectId.isValid(userId)){
         return res.status(404).json({error: "User Id invalid"})
     }
 
-    if(!mongoose.Types.ObjectId.isValid(factID)){
+    if(!mongoose.Types.ObjectId.isValid(factId)){
         return res.status(404).json({error: "Fact Id invalid"})
     }
 
-    // Find existance of user and fact
-    const userExist = await findUserById(userID)
+    try {
+        await insertUpvoteFact(userId, factId);
+        return res.json({message : "OK"});
 
-    if(!userExist){
-        res.status(404).json({error: `${userID} does not exist`})
-    }
-
-    const factExist = await findFactById(factID)
-
-    if(!factExist){
-        res.status(404).json({error: `${factID} does not exist`})
-    }
-
-    try{
-        //check if user already upvoted/downvoted
-        upvoteExist = userExist.upvotedFacts.includes(factID)
-        downvoteExist = userExist.downvotedFacts.includes(factID)
-
-        // if factID doesnt exist in either, add to login.upvoteFacts and increment fact.upvote
-        if(!upvoteExist && !downvoteExist){
-            // add factID to user.upvotedFacts
-            userExist.upvotedFacts.push(factID);
-            await userExist.save();
-
-            // increment fact.upvote
-            factExist.totalUpvotes += 1;
-            await factExist.save();
-
-            return res.status(200).json({msg: factExist})
-        }
-        
-        // if factID only exist in upvote, remove from login.upvotedFacts and decrement fact.upvote
-        if(upvoteExist && !downvoteExist){
-            // remvoe factID from user.upvotedFacts
-            userExist.upvotedFacts.pull(factID);
-            await userExist.save();
-
-            // decrement fact.upvote
-            factExist.totalUpvotes -= 1;
-            await factExist.save()
-
-            return res.status(200).json({msg: factExist})
-        }
-
-        // if factID only exist in downvote, remove from login.downvoteFacts, add to login.upvoteFacts, decrement fact.downvote, increment fact.upvote
-        if(!upvoteExist && downvoteExist){
-            // remove factID from user.downvoteFacts and add to user.upvoteFacts
-            userExist.downvotedFacts.pull(factID);
-            userExist.upvotedFacts.push(factID)
-            await userExist.save();
-
-            // increment fact.upvoteFacts and decrement fact.downvoteFacts
-            factExist.totalDownvotes -= 1;
-            factExist.totalUpvotes += 1;
-            await factExist.save()
-
-            return res.status(200).json({msg: factExist})
-        }
-
-        // if factID exist in both, remove from both
-        // if(upvoteExist && downvoteExist){
-        //     throw err;
-        // }
-
-    }catch (err){
-        console.error(err)
-        return res.status(404).json({error: err})
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message : "error upvoting facts"});
     }
 }
 
 /**
- * Downvote fact controller 
+ * Downvote fact controller
  * Functionality of a user clicking the downvote fact goes here
- * Requires user and fact
+ * Requires userId and factId
  * Steps:
  * find existence of fact
  * find existence of user
  * find if the user already upvoted/downvoted fact
- * if already downvoted, remove fro muser.downvotecomments, decrement fact.downvote
+ * if already downvoted, remove from user.downvote, decrement fact.downvote
+ * if already upvoted, remove from user.upvotefact, add to user.downvotefact, decrement fact.upvote, increment fact.downvote
+ * else add to user.downfact, increment fact.downvote
  */
 async function downvoteFactController(req, res) {
-    const {userID, factID} = req.body
+    const {userId, factId} = req.body
 
     // Make sure id is mongoose valid
-    if(!mongoose.Types.ObjectId.isValid(userID)){
-        return res.status(404).json({error: "User Id invalid"})
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: "Id invalid"})
     }
 
-    if(!mongoose.Types.ObjectId.isValid(factID)){
-        return res.status(404).json({error: "Fact Id invalid"})
+    if(!mongoose.Types.ObjectId.isValid(factId)){
+        return res.status(404).json({error: "Id invalid"})
     }
 
-    // Find existance of user and fact
-    const userExist = await findUserById(userID)
-
-    if(!userExist){
-        res.status(404).json({error: `${userID} does not exist`})
-    }
-
-    const factExist = await findFactById(factID)
-
-    if(!factExist){
-        res.status(404).json({error: `${factID} does not exist`})
-    }
-
-    try{
-        //check if user already upvoted/downvoted
-        upvoteExist = userExist.upvotedFacts.includes(factID)
-        downvoteExist = userExist.downvotedFacts.includes(factID)
-
-        // if factID doesnt exist in either, add to login.downvoteFacts and increment fact.downvote
-        if(!upvoteExist && !downvoteExist){
-            // add factID to user.downvotedFacts
-            userExist.downvotedFacts.push(factID);
-            await userExist.save();
-
-            // increment fact.downvote
-            factExist.totalDownvotes += 1;
-            await factExist.save();
-
-            return res.status(200).json({msg: factExist})
-        }
-
-        // if factID only exist in downvote, remove from login.downvotedFacts and decrement fact.downvote
-        if(!upvoteExist && downvoteExist){
-            // remove factID from user.downvotedFacts
-            userExist.downvotedFacts.pull(factID);
-            await userExist.save();
-
-            // decrement fact.upvote
-            factExist.totalDownvotes -= 1;
-            await factExist.save()
-
-            return res.status(200).json({msg: factExist})
-        }
-
-        // if factID only exist in upvote, remove from login.upvoteFacts, add to login.downvoteFacts, decrement fact.upvote, increment fact.downvote
-        if(upvoteExist && !downvoteExist){
-            // remove factID from user.upvoteFacts and add to user.downvoteFacts
-            userExist.upvotedFacts.pull(factID);
-            userExist.downvotedFacts.push(factID)
-            await userExist.save();
-
-            // increment fact.upvoteFacts and decrement fact.downvoteFacts
-            factExist.totalUpvotes -= 1;
-            factExist.totalDownvotes += 1;
-            await factExist.save()
-
-            return res.status(200).json({msg: factExist})
-        }
-
-    }catch (err){
-        console.error(err)
-        return res.status(404).json({error: err})
+    try {
+        await insertDownvoteFact(userId, factId);
+        return res.json({message : "OK"});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message : "error downvoting fact"})
     }
 }
 
 /* 
-Get All Facts
-Requires: nothing
-Steps:
-Get Facts db
-Retrieve info and return them
-Can have filters and sorts later
+    Get All Facts
+    Requires: nothing
+    Steps:
+    Get Facts db
+    Retrieve info and return them
+    Can have filters and sorts later
 */
+
 async function getFactsController(req, res){
     try{
         const facts = await fetchAllFacts();
         return res.json(facts)
+
     } catch (err){
         console.error(err)
         return res.status(500).json({error: "Internal Server Error"});
     }
 }
 
-/*
-Get a Facts
-Requires: factID
-Steps:
-Get Fact db
-Retrieve info and return them
-*/
-
-/*
-Get All Facts from User
-Requires: User
-Steps:
-Validate and check User Id
-Get Ids from Users upvoteFacts and downvoteFacts
-Find all matching Ids in FactDB
-Return them
-Can have filters and sorts later
-*/
 
 module.exports = {
     factOfTheDayController,
