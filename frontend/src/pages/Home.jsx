@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Nabar";
 import styles from "./Home.module.css"
+import axios from "axios";
 import React, { useContext, useEffect, useState, useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import { authRequest } from "../requests/authRequest";
@@ -8,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
+import { factUpvoteRequest } from "../requests/factUpvoteRequest";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -47,7 +49,7 @@ export default function Home() {
     ];
     
     {/** Fetch today's fact */}
-    const [fact, setFact] = useState("");
+    const [fact, setFact] = useState({});
     const [newComment, setNewComment] = useState("");
 
     useEffect(() => {
@@ -70,13 +72,9 @@ export default function Home() {
 
         async function fetchFact() {
             try {
-                const response = await fetch("http://localhost:4000/facts/today");
-                if (response.ok) {
-                    const data = await response.json();
-                    setFact(data.fact);
-                } else {
-                    console.error("Failed to fetch fact");
-                }
+                const response = await axios.get("http://localhost:4000/facts/today");
+                const data = response.data;
+                setFact(data.fact);
             } catch (error) {
                 console.error("Error fetching fact:", error);
             }
@@ -116,6 +114,21 @@ export default function Home() {
         setNewComment("");
     };
 
+    async function factUpvoteHandler(fact) {
+        if(!fact) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            console.log(`please sign in`);
+            return;
+        }
+
+        console.log(currentUser);
+        try {
+            const updatedFact = await factUpvoteRequest(fact._id, currentUser.id);
+            console.log(updatedFact);
+        } catch(err) {
+            console.error(err);
+        }
+    }
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
@@ -127,11 +140,11 @@ export default function Home() {
             <div>
                 <div className={styles.factTitle}>Fact of the Day #1</div>
                 <div className={styles.factContent}>
-                    {fact}
+                    {fact.fact}
                 </div>
                 <div className={styles.iconsRow}>
                     {/** Upvote Fact Button */}
-                    <FontAwesomeIcon icon={faAnglesUp} onClick={() => setUpvotes(upvotes + 1)} />
+                    <FontAwesomeIcon icon={faAnglesUp} onClick={() => factUpvoteHandler(fact)} />
                     <span>{upvotes}</span>
 
                     {/** Downvote Fact Button */}
