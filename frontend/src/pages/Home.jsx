@@ -140,7 +140,7 @@ export default function Home() {
             <div>
                 <div className={styles.factTitle}>Fact of the Day #1</div>
                 <div className={styles.factContent}>
-                    {fact}
+                    {fact.fact}
                 </div>
                 <div className={styles.iconsRow}>
                     {/** Upvote Fact Button */}

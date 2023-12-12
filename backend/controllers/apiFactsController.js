@@ -1,5 +1,7 @@
 const axios = require("axios");
 const { insertFact, fetchLatestFact} = require("../database");
+const { findUserById, findFactById, fetchAllFacts } = require("../database/fetch");
+const { insertUpvoteFact, insertDownvoteFact } = require("../database/insert");
 
 const MAIN_FACTS_API = "https://api.api-ninjas.com/v1/facts?limit=1";
 const BACKUP_FACTS_API = "https://uselessfacts.jsph.pl/api/v2/facts/random";
@@ -78,69 +80,14 @@ async function upvoteFactController(req, res) {
         return res.status(404).json({error: "Fact Id invalid"})
     }
 
-    // Find existance of user and fact
-    const userExist = await Login.findById(userId)
+    try {
+        await insertUpvoteFact(userId, factId);
+        return res.json({message : "OK"});
 
-    if(!userExist){
-        res.status(404).json({error: "Id does not exist"})
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message : "error upvoting facts"});
     }
-
-    const factExist = await Fact.findById(factId)
-
-    if(!factExist){
-        res.status(404).json({error: "Id does not exist"})
-    }
-
-    // if upvoteFact already exist in User.upvoteFacts
-    if(userExist.upvotedFacts.includes(factId)){
-        //remove it from User.upvotedFacts
-        const updatedUser = await Login.findByIdAndUpdate(
-            userId,
-            { $pull: { upvotedFacts: factId } },
-            {new: true}
-        );
-
-        //decrement Facts.totalUpvotes
-        const updatedFact = await Fact.findByIdAndUpdate(
-            factId,
-            { $inc: { totalUpvotes: -1 } },
-            {new: true}
-        );
-
-        return res.json({ message: '3. Fact Successfully remove upvote', user: updatedUser, fact: updatedFact });
-    }
-    //if upvoteFact already exist in User.downvoteFacts
-    if(userExist.downvotedFacts.includes(factId)){
-        //remove it from User.downvotedFacts & add it to User.updatedFacts
-        const updatedUser = await Login.findByIdAndUpdate(
-            userId,
-            { $pull: {downvotedFacts: factId}, $push: {upvotedFacts: factId}},
-            { new: true}
-        )
-
-        //decrement Facts.totalDownvotes & increment Facts.totalUpvotes
-        const updatedFact = await Fact.findByIdAndUpdate(
-            factId,
-            { $inc: {totalDownvotes: -1, totalUpvotes: 1}},
-            { new: true }
-        )
-
-        return res.json({ message: '2. Fact Successfully upvote from downvote', user: updatedUser, fact: updatedFact });
-    }
-    //if upvotedFact doesnt exist in either, just add and increment
-    const updatedUser = await Login.findByIdAndUpdate(
-        userId,
-        { $push: { upvotedFacts: factId }},
-        { new: true } // move 'new: true' here
-    );
-    
-    const updatedFact = await Fact.findByIdAndUpdate(
-        factId,
-        { $inc: { totalUpvotes: 1 } },
-        { new: true } // move 'new: true' here
-    );
-
-    return res.json({ message: '1. Fact Successfully upvoted', user: updatedUser, fact: updatedFact });
 }
 
 /**
@@ -167,85 +114,29 @@ async function downvoteFactController(req, res) {
         return res.status(404).json({error: "Id invalid"})
     }
 
-    // Find existance of user and fact
-    const userExist = await Login.findById(userId)
-
-    if(!userExist){
-        res.status(404).json({error: "Id does not exist"})
+    try {
+        await insertDownvoteFact(userId, factId);
+        return res.json({message : "OK"});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message : "error downvoting fact"})
     }
-
-    const factExist = await Fact.findById(factId)
-
-    if(!factExist){
-        res.status(404).json({error: "Id does not exist"})
-    }
-
-    // if upvoteFact already exist in User.downvotedFact
-    if(userExist.downvotedFacts.includes(factId)){
-        //remove it from User.downvotedFacts
-        const updatedUser = await Login.findByIdAndUpdate(
-            userId,
-            { $pull: { downvotedFacts: factId } },
-            {new: true}
-        );
-
-        //decrement Facts.totalUpvotes
-        const updatedFact = await Fact.findByIdAndUpdate(
-            factId,
-            { $inc: { totalDownvotes: -1 } },
-            {new: true}
-        );
-
-        return res.json({ message: '3. Fact Successfully remove downvote', user: updatedUser, fact: updatedFact });
-    }
-    //if downvoteFact already exist in User.upvoteFacts
-    if(userExist.upvotedFacts.includes(factId)){
-        //remove it from User.downvotedFacts & add it to User.updatedFacts
-        const updatedUser = await Login.findByIdAndUpdate(
-            userId,
-            { $pull: {upvotedFacts: factId}, $push: {downvotedFacts: factId}},
-            { new: true}
-        )
-
-        //decrement Facts.totalDownvotes & increment Facts.totalUpvotes
-        const updatedFact = await Fact.findByIdAndUpdate(
-            factId,
-            { $inc: {totalUpvotes: -1, totalDownvotes: 1}},
-            { new: true }
-        )
-
-        return res.json({ message: '2. Fact Successfully downvote from upvote', user: updatedUser, fact: updatedFact });
-    }
-    //if upvotedFact doesnt exist in either, just add and increment
-    const updatedUser = await Login.findByIdAndUpdate(
-        userId,
-        { $push: { downvotedFacts: factId }},
-        { new: true } // move 'new: true' here
-    );
-    
-    const updatedFact = await Fact.findByIdAndUpdate(
-        factId,
-        { $inc: { totalDownvotes: 1 } },
-        { new: true } // move 'new: true' here
-    );
-
-    return res.json({ message: '1. Fact Successfully downvote', user: updatedUser, fact: updatedFact });
 }
 
 /* 
-Get All Facts
-Requires: nothing
-Steps:
-Get Facts db
-Retrieve info and return them
-Can have filters and sorts later
+    Get All Facts
+    Requires: nothing
+    Steps:
+    Get Facts db
+    Retrieve info and return them
+    Can have filters and sorts later
 */
 
 async function getFactsController(req, res){
     try{
-        const facts = await Fact.find(); //add filters/sorts here
+        const facts = await fetchAllFacts();
+        return res.json(facts)
 
-        return res.status(200).json(facts)
     } catch (err){
         console.error(err)
         return res.status(500).json({error: "Internal Server Error"});

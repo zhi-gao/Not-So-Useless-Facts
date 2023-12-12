@@ -2,14 +2,13 @@
  * User login controller 
  * Functionality of processing the login request goes here
 */
-const Login = require('../database/models/loginModel')
-const Fact = require('../database/models/factModel')
 const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
-const { findUserWithEmail, userExists } = require('../database/fetch')
-const { insertUser } = require('../database/insert')
+const { findUserWithEmail, userExists, findFactById, findUserById, findCommentsByIds } = require('../database/fetch')
+const { insertUser, insertComment, updateRefreshToken } = require('../database/insert')
+const { removeRefreshToken } = require('../database/delete')
 
 async function authController(req, res) {
     // get access token
@@ -62,7 +61,7 @@ async function authController(req, res) {
             // token not expired
             try {
                 // verify that refresh token is valid
-                const user = await Login.findOne({email : decodedRefreshToken.email});
+                const user = await findUserWithEmail(decodedRefreshToken.email);
                 if(!user) return res.status(401).json({status : "No user found"});
 
                 const validRefreshTokens = user.refreshTokens
@@ -116,8 +115,7 @@ async function loginController(req, res) {
 
         const refreshToken = jwt.sign(newUser, REFRESH_TOKEN_KEY, {expiresIn: '7d'});
 
-        user.refreshTokens.push(refreshToken);
-        await user.save();
+        await updateRefreshToken(email, refreshToken);
 
         //successful login
         res.cookie("refreshToken", refreshToken, {
@@ -149,8 +147,7 @@ async function logoutController(req, res) {
         const user = await findUserWithEmail(email);
         if(!user) return res.status({status : "No user found"});
 
-        user.refreshTokens = user.refreshTokens.filter(token => token !== refreshToken);
-        await user.save();
+        await removeRefreshToken(email, refreshToken);
 
         res.json({status: "Logged out Successful"})
     }catch (error){
@@ -240,41 +237,25 @@ async function postCommentController(req, res) {
         return res.status(404).json({error: "Id invalid"})
     }
 
-    const userExist = Login.findById(userId)
+    const userExist = await userExists(null, null, userId);
     
     if(!userExist){
         return res.status(404).json({error: "User does not exist"})
     }
 
-    const factExist = Fact.findById(factId)
+    const factExist = await findFactById(factId);
 
     if(!factExist){
         return res.status(404).json({error: "Fact does not exist"})
     }
 
     try{
-        // create new comment
-        const newComment = {
+        await insertComment({
             userId: userId, 
             factId: factId, 
-            comment: comment
-        }
-        const createComment = await Comment.create(newComment)
+            comment: comment})
 
-        // update facts
-        await Fact.findByIdAndUpdate(
-            factId,
-            {$push: {comments: createComment._id}},
-            {new: true}
-        )
-        // update users
-        await Login.findByIdAndUpdate(
-            userId,
-            {$push: {comments: createComment._id}},
-            {new: true}
-        )
-
-        return res.status(200).json(comment)
+        return res.json(comment)
 
     }catch(error){
         console.error(error)
@@ -299,7 +280,7 @@ async function getCommentsController(req, res){
     }
 
     // Find existance of either. May be a problem if somehow user and facts share id.
-    const iExist = await Login.findById(id) || await Fact.findById(id)
+    const iExist = await findUserById(id) || await findFactById(id)
 
     // Return if nonexistance
     if(!iExist) {
@@ -311,10 +292,10 @@ async function getCommentsController(req, res){
         const commentIDs = iExist.comments;
 
         // get all comments based on id
-        const comments = await Comment.find({_id: {$in: commentIDs }})
+        const comments = await findCommentsByIds(commentIDs);
 
         // return comments
-        return res.status(200).json(comments)
+        return res.json(comments)
     } catch (error){
         console.error(error)
         return res.status(500).json({error: "Internal Server Error"})
