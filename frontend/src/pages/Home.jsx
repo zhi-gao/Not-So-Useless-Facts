@@ -10,6 +10,8 @@ import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '
 import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
 import { factUpvoteRequest } from "../requests/factUpvoteRequest";
+import { factDownvoteRequest } from "../requests/factDownvoteRequest";
+import { postCommentRequest } from "../requests/postCommentRequest";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -23,6 +25,7 @@ export default function Home() {
     const [showFactReportModal, setShowFactReportModal] = useState(false);
     const [isUserFlagged, setIsUserFlagged] = useState(false);
     const [showUserReportModal, setShowUserReportModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const portalContainerRef = useRef(null);
 
     {/** Fetch today's fact */}
@@ -40,6 +43,7 @@ export default function Home() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
+                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
                     console.log(err);
@@ -105,6 +109,23 @@ export default function Home() {
         setShowUserReportModal(false);
     };
 
+    const handleCommentSubmit = async () => {
+        if(newComment === "") return;
+
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const res = await postCommentRequest(fact._id, currentUser.user_id, newComment);
+            console.log(res);
+            console.log(comments);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    
     const handleShowComments = async () => {
         setShowComments(!showComments);
         if (!showComments) {
@@ -112,32 +133,55 @@ export default function Home() {
         }
     };
 
-    const handleCommentSubmit = () => {
-        console.log("New Comment:", newComment);
-
-        setNewComment("");
-    };
-
     async function factUpvoteHandler(fact) {
         if(!fact) return;
         if(JSON.stringify(currentUser) === "{}") {
-            console.log(`please sign in`);
+            setShowLoginModal(true);
             return;
         }
 
-        console.log(currentUser);
         try {
-            const updatedFact = await factUpvoteRequest(fact._id, currentUser.id);
+            const updatedFact = await factUpvoteRequest(fact._id, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
             console.log(updatedFact);
         } catch(err) {
             console.error(err);
         }
     }
+
+    async function factDownvoteHandler(fact) {
+        if(!fact) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const updatedFact = await factDownvoteRequest(fact._id, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
+            console.log(updatedFact);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
 
     return <div>
+        {(showLoginModal || showUserReportModal || showFactReportModal) && <div className={styles.backdrop}></div>}
+        {showLoginModal && <dialog open className={styles.loginDialog}>
+            <p>You have to login in order to perform this action</p>
+            <form method="dialog">  
+                <button onClick={() => setShowLoginModal(false)}>OK</button>
+                <button onClick={() => navigate("/login")}>Login</button>
+            </form>
+        </dialog>}
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
         <div className={`${styles.flexContainer} ${styles.factSection}`}>
@@ -152,7 +196,7 @@ export default function Home() {
                     <span>{upvotes}</span>
 
                     {/** Downvote Fact Button */}
-                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => setDownvotes(downvotes + 1)} />
+                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => factDownvoteHandler(fact)} />
                     <span>{downvotes}</span>
 
                     {/** Comment Fact Button */}

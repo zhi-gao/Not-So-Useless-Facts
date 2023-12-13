@@ -6,7 +6,7 @@ export async function factUpvoteRequest(factId, userId) {
             userId, factId
         }, {withCredentials : true});
 
-        return res.data;
+        return res.data?.msg;
     } catch (err) {
         throw err;
     }
