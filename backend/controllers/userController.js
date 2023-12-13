@@ -209,7 +209,7 @@ async function getUserController(req, res) {
             return res.status(404).json({error: `User ${id} does not exist`})
         }
 
-        return res.status(200).json(foundUser)
+        return res.status(200).json(foundUser.username)
     }catch(err){
         console.error(err)
         return res.status(500).json({err: err})

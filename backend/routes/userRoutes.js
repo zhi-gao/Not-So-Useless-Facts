@@ -8,9 +8,9 @@ router.post("/user/register", controller.registerController);
 
 router.post("/user/auth", controller.authController);
 
-router.get("/user/search", controller.getUserController);
+router.post("/user/search", controller.getUserController);
 
 router.post("/comments/c", controller.postCommentController);
-router.get("/comments", controller.getCommentsController);
+router.post("/comments", controller.getCommentsController);
 
 module.exports = router;
