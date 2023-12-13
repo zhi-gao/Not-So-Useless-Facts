@@ -62,8 +62,22 @@ export default function Home() {
                 setComments(data.fact.comments);
 
                 setFact(data.fact);
+                await fetchCommentsForFact(data.fact._id);
             } catch (error) {
                 console.error("Error fetching fact:", error);
+            }
+        }
+
+        async function fetchCommentsForFact(factId) {
+            try {
+                const response = await axios.post("http://localhost:4000/comments", {
+                    id: factId
+                });
+    
+                const commentsData = response.data;
+                setComments(commentsData);
+            } catch (error) {
+                console.error("Error fetching comments:", error);
             }
         }
 
@@ -110,8 +124,13 @@ export default function Home() {
         } catch (err) {
             console.log(err);
         }
-
-        setNewComment("");
+    }
+    
+    const handleShowComments = async () => {
+        setShowComments(!showComments);
+        if (!showComments) {
+            await fetchCommentsForFact(fact._id);
+        }
     };
 
     async function factUpvoteHandler(fact) {
@@ -150,10 +169,6 @@ export default function Home() {
         }
     }
 
-    async function showCommentsHandler() {
-        
-    }
-
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
@@ -185,7 +200,7 @@ export default function Home() {
                     <span>{downvotes}</span>
 
                     {/** Comment Fact Button */}
-                    <FontAwesomeIcon icon={faCommentDots} onClick={() => showCommentsHandler()} />
+                    <FontAwesomeIcon icon={faCommentDots} onClick={handleShowComments} />
                     <span>{comments.length}</span>
 
                     {/** Flag Fact Button */}
@@ -215,10 +230,10 @@ export default function Home() {
                         <div key={index}>
                             <div>
                                 <strong>
-                                    <a href="#" onClick={() => handleUserClick(comment.username)}>
-                                        {comment.username}
+                                    <a href="#" onClick={() => handleUserClick(comment.userId)}>
+                                        {comment.userId}
                                     </a>
-                                </strong>: {comment.content}
+                                </strong>: {comment.comment}
                             </div>
                             <div className={styles.iconsContainer}>
                                 {/** Upvote Comment Button */}
