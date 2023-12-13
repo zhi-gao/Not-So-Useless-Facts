@@ -10,6 +10,7 @@ const { findUserWithEmail, userExists, findFactById, findUserById, findCommentsB
 const { insertUser, insertComment, updateRefreshToken } = require('../database/insert')
 const { removeRefreshToken } = require('../database/delete')
 
+
 async function authController(req, res) {
     // get access token
     const authHeader = req.headers.authorization;
@@ -191,20 +192,21 @@ searches loginDB
 returns if found
 */
 async function getUserController(req, res) {
-    const { userId } = req.body
+    const { id } = req.body
+    console.log("UserId: ", id)
 
     // Make sure id is mongoose valid
-    if(!mongoose.Types.ObjectId.isValid(userId)){
-        return res.status(404).json({error: `${userId} is invalid`})
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(404).json({error: `${id} is invalid`})
     }
 
     try{
         // Get User
-        const foundUser = await Login.findById(userId)
+        const foundUser = await findUserById(id)
 
         // Return if not found
         if(!foundUser){
-            return res.status(404).json({error: `User ${userId} does not exist`})
+            return res.status(404).json({error: `User ${id} does not exist`})
         }
 
         return res.status(200).json(foundUser)
@@ -287,7 +289,7 @@ Retrieve and return comments
 */
 async function getCommentsController(req, res){
     const { id } = req.body
-
+    console.log("UserId: ", id)
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: `${id} is invalid`})
