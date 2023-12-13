@@ -12,6 +12,8 @@ import UserReportModal from "../components/UserReportModal";
 import { factUpvoteRequest } from "../requests/factUpvoteRequest";
 import { factDownvoteRequest } from "../requests/factDownvoteRequest";
 import { postCommentRequest } from "../requests/postCommentRequest";
+import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
+import { getUsernameRequest } from "../requests/getUsernameRequest";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -62,22 +64,8 @@ export default function Home() {
                 setComments(data.fact.comments);
 
                 setFact(data.fact);
-                await fetchCommentsForFact(data.fact._id);
             } catch (error) {
                 console.error("Error fetching fact:", error);
-            }
-        }
-
-        async function fetchCommentsForFact(factId) {
-            try {
-                const response = await axios.post("http://localhost:4000/comments", {
-                    id: factId
-                });
-    
-                const commentsData = response.data;
-                setComments(commentsData);
-            } catch (error) {
-                console.error("Error fetching comments:", error);
             }
         }
 
@@ -126,10 +114,28 @@ export default function Home() {
         }
     }
     
+    async function updateCommentsWithUsername(commentsData) {
+        const updatedCommentsData = [];
+        for (const comment of commentsData) {
+            try {
+                const userData = await getUsernameRequest(comment.userId);
+                const updatedComment = { ...comment, userName: userData };
+                updatedCommentsData.push(updatedComment);
+            } catch (error) {
+                console.error(`Error fetching username for userId ${comment.userId}:`, error);
+                updatedCommentsData.push(comment);
+            }
+        }
+        setComments(updatedCommentsData) 
+    }
+
     const handleShowComments = async () => {
+        if (!fact || !fact._id) return;
+
         setShowComments(!showComments);
         if (!showComments) {
-            await fetchCommentsForFact(fact._id);
+            const commentsData = await getFactCommentsRequest(fact._id);
+            await updateCommentsWithUsername(commentsData);      
         }
     };
 
@@ -231,7 +237,7 @@ export default function Home() {
                             <div>
                                 <strong>
                                     <a href="#" onClick={() => handleUserClick(comment.userId)}>
-                                        {comment.userId}
+                                        {(comment.userName)}
                                     </a>
                                 </strong>: {comment.comment}
                             </div>

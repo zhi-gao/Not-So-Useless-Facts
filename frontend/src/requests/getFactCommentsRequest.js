@@ -1,7 +1,9 @@
+import axios from "axios";
+
 export async function getFactCommentsRequest(factId) {
     try {
-        const res = await axios.get("http://localhost:4000/comments", {
-            factId
+        const res = await axios.post("http://localhost:4000/comments", {
+            id: factId
         });
 
         return res.data;

@@ -6,7 +6,10 @@
 }
 
 .content {
-    text-align: center;
+    text-align: left;
+    width: 800px;
+    height: 400px;
+    overflow-y: auto;
 }
 
 .buttons button {
@@ -16,4 +19,5 @@
 .buttons {
     margin-top: 20px;
     gap: 10px;
+    text-align: center;
 }
