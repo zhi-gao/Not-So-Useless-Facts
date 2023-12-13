@@ -231,12 +231,12 @@ async function postCommentController(req, res) {
     }
 
     try{
-        await insertComment({
-            userId: userId, 
-            factId: factId, 
-            comment: comment})
+        const newComment = await insertComment({
+                                userId: userId, 
+                                factId: factId, 
+                                comment: comment})
 
-        return res.json(comment)
+        return res.json(newComment)
 
     }catch(error){
         console.error(error)
@@ -245,8 +245,8 @@ async function postCommentController(req, res) {
 }
 
 /*
-Get all Comments made by user
-Requires: User or Fact id
+Get all Comments made by user or attached to facts
+Requires: User id or Fact id
 Steps:
 Validate id
 Find id in UserDB/FactDB
@@ -257,20 +257,20 @@ async function getCommentsController(req, res){
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({error: "Id invalid"})
+        return res.status(404).json({error: `${id} is invalid`})
     }
 
     // Find existance of either. May be a problem if somehow user and facts share id.
-    const iExist = await findUserById(id) || await findFactById(id)
+    const idExist = await findUserById(id) || await findFactById(id)
 
     // Return if nonexistance
-    if(!iExist) {
-        return res.status(404).json({error: "ID does not exist"})
+    if(!idExist) {
+        return res.status(404).json({error: `${id} is does not exist`})
     }
 
     try{
         // Get comments id
-        const commentIDs = iExist.comments;
+        const commentIDs = idExist.comments;
 
         // get all comments based on id
         const comments = await findCommentsByIds(commentIDs);
