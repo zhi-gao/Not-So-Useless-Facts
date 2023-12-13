@@ -23,6 +23,7 @@ export default function Home() {
     const [showFactReportModal, setShowFactReportModal] = useState(false);
     const [isUserFlagged, setIsUserFlagged] = useState(false);
     const [showUserReportModal, setShowUserReportModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
     const portalContainerRef = useRef(null);
 
     {/** Fetch today's fact */}
@@ -92,7 +93,10 @@ export default function Home() {
     };
 
     const handleCommentSubmit = () => {
-        console.log("New Comment:", newComment);
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
 
         setNewComment("");
     };
@@ -100,11 +104,10 @@ export default function Home() {
     async function factUpvoteHandler(fact) {
         if(!fact) return;
         if(JSON.stringify(currentUser) === "{}") {
-            console.log(`please sign in`);
+            setShowLoginModal(true);
             return;
         }
 
-        console.log(currentUser);
         try {
             const updatedFact = await factUpvoteRequest(fact._id, currentUser.id);
             console.log(updatedFact);
@@ -112,11 +115,28 @@ export default function Home() {
             console.error(err);
         }
     }
+
+    async function factDownvoteHandler(fact) {
+        if(!fact) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }  
+    }
+
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
 
     return <div>
+        {(showLoginModal || showUserReportModal || showFactReportModal) && <div className={styles.backdrop}></div>}
+        {showLoginModal && <dialog open className={styles.loginDialog}>
+            <p>You have to login in order to perform this action</p>
+            <form method="dialog">  
+                <button onClick={() => setShowLoginModal(false)}>OK</button>
+                <button onClick={() => navigate("/login")}>Login</button>
+            </form>
+        </dialog>}
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
         <div className={`${styles.flexContainer} ${styles.factSection}`}>
@@ -131,7 +151,7 @@ export default function Home() {
                     <span>{upvotes}</span>
 
                     {/** Downvote Fact Button */}
-                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => setDownvotes(downvotes + 1)} />
+                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => factDownvoteHandler(fact)} />
                     <span>{downvotes}</span>
 
                     {/** Comment Fact Button */}
