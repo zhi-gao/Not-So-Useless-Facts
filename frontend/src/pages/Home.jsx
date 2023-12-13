@@ -10,6 +10,8 @@ import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '
 import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
 import { factUpvoteRequest } from "../requests/factUpvoteRequest";
+import { factDownvoteRequest } from "../requests/factDownvoteRequest";
+import { postCommentRequest } from "../requests/postCommentRequest";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -41,6 +43,7 @@ export default function Home() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
+                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
                     console.log(err);
@@ -92,10 +95,19 @@ export default function Home() {
         setShowUserReportModal(false);
     };
 
-    const handleCommentSubmit = () => {
+    const handleCommentSubmit = async () => {
+        if(newComment === "") return;
+
         if(JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);
             return;
+        }
+
+        try {
+            const res = await postCommentRequest(fact._id, currentUser.user_id, newComment);
+            console.log(res);
+        } catch (err) {
+            console.log(err);
         }
 
         setNewComment("");
@@ -109,7 +121,10 @@ export default function Home() {
         }
 
         try {
-            const updatedFact = await factUpvoteRequest(fact._id, currentUser.id);
+            const updatedFact = await factUpvoteRequest(fact._id, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
             console.log(updatedFact);
         } catch(err) {
             console.error(err);
@@ -121,7 +136,17 @@ export default function Home() {
         if(JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);
             return;
-        }  
+        }
+
+        try {
+            const updatedFact = await factDownvoteRequest(fact._id, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
+            console.log(updatedFact);
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     const handleUserClick = (username) => {
