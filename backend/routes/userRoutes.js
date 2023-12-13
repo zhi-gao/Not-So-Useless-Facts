@@ -8,7 +8,11 @@ router.post("/user/register", controller.registerController);
 
 router.post("/user/auth", controller.authController);
 
+router.get("/user/search", controller.getUserController);
+
 router.post("/comments/c", controller.postCommentController);
 router.post("/comments", controller.getCommentsController);
+
+
 
 module.exports = router;

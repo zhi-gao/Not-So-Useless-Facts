@@ -90,7 +90,7 @@ async function authController(req, res) {
 
 async function loginController(req, res) {
     const { email, password } = req.body;
-
+    console.log(email, password)
     try{
         const user = await findUserWithEmail(email);
 
@@ -182,6 +182,38 @@ async function registerController(req, res) {
     }
 }
 
+/*
+Searches and returns one user
+Requires: UserId
+Steps:
+Validates userId
+searches loginDB
+returns if found
+*/
+async function getUserController(req, res) {
+    const { userId } = req.body
+
+    // Make sure id is mongoose valid
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: `${userId} is invalid`})
+    }
+
+    try{
+        // Get User
+        const foundUser = await Login.findById(userId)
+
+        // Return if not found
+        if(!foundUser){
+            return res.status(404).json({error: `User ${userId} does not exist`})
+        }
+
+        return res.status(200).json(foundUser)
+    }catch(err){
+        console.error(err)
+        return res.status(500).json({err: err})
+    }
+}
+
 
 // COMMENTS CONTROLLERS
 
@@ -254,7 +286,7 @@ Find id in UserDB/FactDB
 Retrieve and return comments
 */
 async function getCommentsController(req, res){
-    const {id} = req.body
+    const { id } = req.body
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
@@ -290,6 +322,7 @@ module.exports = {
     loginController,
     logoutController,
     registerController,
+    getUserController,
     upvoteCommentController,
     downvoteCommentController,
     postCommentController,
