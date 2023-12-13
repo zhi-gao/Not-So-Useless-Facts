@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { default: mongoose } = require('mongoose');
 const { insertFact, fetchLatestFact} = require("../database");
-const { findUserById, findFactById, fetchAllFacts } = require("../database/fetch");
+const { findUserById, findFactById, findFactsById, fetchAllFacts } = require("../database/fetch");
 const { insertUpvoteFact, insertDownvoteFact } = require("../database/insert");
 
 const MAIN_FACTS_API = "https://api.api-ninjas.com/v1/facts?limit=1";
@@ -305,7 +305,7 @@ async function getUserUpvoteFactsController(req, res){
         const upvoteFactsIds = idExist.upvotedFacts;
 
         // get all comments based on id
-        const facts = await findFactById(upvoteFactsIds);
+        const facts = await findFactsById(upvoteFactsIds);
 
         // return comments
         return res.json(facts)
@@ -345,7 +345,7 @@ async function getUserDownvoteFactsController(req, res){
         const downvoteFactsIds = idExist.downvotedFacts;
 
         // get all comments based on id
-        const facts = await findFactById(downvoteFactsIds);
+        const facts = await findFactsById(downvoteFactsIds);
 
         // return comments
         return res.json(facts)

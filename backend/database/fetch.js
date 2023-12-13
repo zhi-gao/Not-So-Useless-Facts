@@ -82,6 +82,17 @@ async function findFactById(factId) {
     }
 }
 
+// returns array of facts
+async function findFactsById(factIds) {
+    try {
+        const facts = await Fact.find({ _id: { $in: factIds } });
+        return facts;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
+
 async function findCommentsByIds(commentIds) {
     try {
         const comments = await Comment.find({_id: {$in: commentIds }});
@@ -98,5 +109,6 @@ module.exports = {
     userExists,
     findUserById,
     findFactById,
+    findFactsById,
     findCommentsByIds,
 }
