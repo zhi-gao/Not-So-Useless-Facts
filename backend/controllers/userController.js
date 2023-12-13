@@ -235,7 +235,8 @@ async function postCommentController(req, res) {
                                 userId: userId, 
                                 factId: factId, 
                                 comment: comment})
-
+        
+        console.log(newComment);
         return res.json(newComment)
 
     }catch(error){

@@ -106,6 +106,7 @@ export default function Home() {
         try {
             const res = await postCommentRequest(fact._id, currentUser.user_id, newComment);
             console.log(res);
+            console.log(comments);
         } catch (err) {
             console.log(err);
         }
@@ -149,6 +150,10 @@ export default function Home() {
         }
     }
 
+    async function showCommentsHandler() {
+        
+    }
+
     const handleUserClick = (username) => {
         navigate(`/profile/${username}`);
     };
@@ -180,7 +185,7 @@ export default function Home() {
                     <span>{downvotes}</span>
 
                     {/** Comment Fact Button */}
-                    <FontAwesomeIcon icon={faCommentDots} onClick={() => setShowComments(!showComments)} />
+                    <FontAwesomeIcon icon={faCommentDots} onClick={() => showCommentsHandler()} />
                     <span>{comments.length}</span>
 
                     {/** Flag Fact Button */}

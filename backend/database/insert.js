@@ -59,6 +59,8 @@ async function insertComment({factId, userId, comment}) {
             {$push: {comments: createComment._id}},
             {new: true}
         )
+
+        return createComment;
     } catch (err) {
         throw err;
     }

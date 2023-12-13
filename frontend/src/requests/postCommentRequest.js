@@ -6,7 +6,7 @@ export async function postCommentRequest(factId, userId, comment) {
             userId, factId, comment
         });
 
-        return res.data;
+        return res.data?.comment;
     } catch (err) {
         throw err;
     }
