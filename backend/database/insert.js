@@ -1,6 +1,7 @@
 const Fact = require("./models/factModel");
 const Login = require("./models/loginModel");
 const Comment = require("./models/commentModel");
+const Report = require("../database/models/reportModel")
 
 async function insertFact(fact, source) {
     try {
@@ -195,7 +196,24 @@ async function insertDownvoteFact(userId, factId) {
     } catch (err) {
         throw err;
     }
+}
 
+async function insertReport({userId, recipientId, recipientType, flag, comment}){
+    try{
+        const report = await Report.create({
+            userId: userId,
+            recipientId: recipientId,
+            recipientType: recipientType,
+            flag: flag,
+            comment: comment
+            })
+        console.log("report2: ", report)
+        return report;
+    }catch(err){
+        console.error("An error has occured when inserting comment");
+        console.error(err);
+        return null;
+    }
 }
 
 module.exports = {
@@ -205,4 +223,5 @@ module.exports = {
     insertComment,
     insertUpvoteFact,
     insertDownvoteFact,
+    insertReport
 }

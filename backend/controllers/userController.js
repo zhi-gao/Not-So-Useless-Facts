@@ -7,9 +7,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
 const { findUserWithEmail, userExists, findFactById, findUserById, findCommentByIds, findCommentsByIds } = require('../database/fetch')
-const { insertUser, insertComment, updateRefreshToken } = require('../database/insert')
+const { insertUser, insertComment, insertReport, updateRefreshToken } = require('../database/insert')
 const { removeRefreshToken } = require('../database/delete')
-
 
 async function authController(req, res) {
     // get access token
@@ -218,12 +217,6 @@ async function getUserController(req, res) {
 
 
 // COMMENTS CONTROLLERS
-async function test(req, res){
-    const { id } = req.body;
-    console.log("test: ", id)
-    return res.json({msg: id})
-}
-
 
 /*
  * User upvote comment
@@ -234,9 +227,7 @@ async function test(req, res){
  * if already upvoted, remove from user.upvotecomments, decrement comment.upvote
  */
 async function upvoteCommentController(req, res) {
-    const {userId, commentId} = req.body
-    console.log(userId)
-    console.log(commentId)
+    const {userId, commentId} = req.query
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){
@@ -492,6 +483,58 @@ async function getCommentsController(req, res){
 
 }
 
+// REPORT CONTROLLERS
+
+/*
+    User filing a report on another User or Fact
+    Requires: UserId of reporter, recipientId being reported on, recipienttype = ['User', 'Fact'], flags types (depends on type)
+    Validate userId 
+    Validate recipientId
+    Check if ModelType is appropriate string
+    Get Id from appropriate model
+    Check if exist
+*/
+async function reportController(req, res){
+    // const {userId, recipientId, recipientType, flag} = req.body;
+    const {userId, recipientId, recipientType, flag, comment} = req.query;
+    console.log(req.query)
+    recipientExist = "None";
+
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: `UserId ${userId} is invalid`});
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(recipientId)){
+        return res.status(404).json({error: `ComplaintId ${recipientId} is invalid`});
+    }
+
+    if(recipientType !== 'User' && recipientType !== 'Fact'){
+        return res.status(404).json({error: `RecipientType '${recipientType}' is invalid`});
+    }
+
+    if(recipientType === "User"){
+        recipientExist = await findUserById(recipientId)
+    }
+
+    if(recipientType === "Fact"){
+        recipientExist = await findFactById(recipientId)
+    }
+
+    if(!recipientExist){
+        return res.status(404).json({error: `Recipient ${recipientExist} is does not exist`})
+    }
+
+    try{
+        const report = await insertReport({userId: userId, recipientId: recipientExist.id, recipientType: recipientType, flag: flag, comment: comment})
+        console.log("Report: ", report)
+        return res.status(202).json({msg: report})
+    }catch(err){
+        console.error(err)
+        return res.status(500).json({error: err.message})
+    }
+}
+
+
 module.exports = {
     authController,
     loginController,
@@ -502,5 +545,5 @@ module.exports = {
     downvoteCommentController,
     postCommentController,
     getCommentsController,
-    test
+    reportController
 }

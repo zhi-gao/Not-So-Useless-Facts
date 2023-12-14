@@ -14,6 +14,7 @@ router.post("/comments/c", controller.postCommentController);
 router.post("/comments", controller.getCommentsController);
 router.post("/comments/upvote", controller.upvoteCommentController);
 router.post("/comments/downvote", controller.downvoteCommentController);
-router.get("/comments/test", controller.test);
+
+router.post("/user/report", controller.reportController);
 
 module.exports = router;
