@@ -6,7 +6,7 @@ const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
-const { findUserWithEmail, userExists, findFactById, findUserById, findCommentByIds, findCommentsByIds } = require('../database/fetch')
+const { findUserWithEmail, userExists, findFactById, findUserById, findCommentById, findCommentsByIds } = require('../database/fetch')
 const { insertUser, insertComment, insertReport, updateRefreshToken } = require('../database/insert')
 const { removeRefreshToken } = require('../database/delete')
 
@@ -242,13 +242,13 @@ async function upvoteCommentController(req, res) {
     const userExist = await findUserById(userId)
 
     if(!userExist){
-        res.status(404).json({error: `${userId} does not exist`})
+        res.status(404).json({error: `User ${userId} does not exist`})
     }
 
     const commentExist = await findCommentById(commentId)
 
     if(!commentExist){
-        res.status(404).json({error: `${commentId} does not exist`})
+        res.status(404).json({error: `Comment ${commentId} does not exist`})
     }
 
     try{
@@ -316,7 +316,8 @@ async function upvoteCommentController(req, res) {
  * if already downvoted, remove from user.downvotecomments, decrement comment.downvote
  */
 async function downvoteCommentController(req, res) {
-    const {userId, commentId} = req.body
+    // const {userId, commentId} = req.body
+    const { userId, commentId } = req.query;
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){
@@ -352,7 +353,7 @@ async function downvoteCommentController(req, res) {
             await userExist.save();
 
             // increment comment.upvote
-            commentExist.totalDowvotes += 1;
+            commentExist.totalDownvotes += 1;
             await commentExist.save();
 
             return res.status(200).json({msg: commentExist})
