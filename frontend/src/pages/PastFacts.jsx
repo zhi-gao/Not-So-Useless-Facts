@@ -18,8 +18,6 @@ export default function PastFacts() {
     const navigate = useNavigate();
     const {currentUser, setCurrentUser} = useContext(UserContext);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    const [upvotes, setUpvotes] = useState(0);
-    const [downvotes, setDownvotes] = useState(0);
     const [factComments, setFactComments] = useState({});
     const [isFactFlagged, setIsFactFlagged] = useState(false);
     const [showFactReportModal, setShowFactReportModal] = useState(false);
@@ -139,10 +137,17 @@ export default function PastFacts() {
 
         try {
             const updatedFact = await factUpvoteRequest(factId, currentUser.user_id);
-            setUpvotes(updatedFact.totalUpvotes);
-            setDownvotes(updatedFact.totalDownvotes);
-            setFact(updatedFact);
-            console.log(updatedFact);
+            const updatedFacts = pastFacts.map(fact => {
+                if (fact._id === factId) {
+                    return {
+                        ...fact,
+                        totalUpvotes: updatedFact.totalUpvotes,
+                        totalDownvotes: updatedFact.totalDownvotes
+                    };
+                }
+                return fact;
+            });
+            setPastFacts(updatedFacts);
         } catch(err) {
             console.error(err);
         }
@@ -157,12 +162,19 @@ export default function PastFacts() {
 
         try {
             const updatedFact = await factDownvoteRequest(factId, currentUser.user_id);
-            setUpvotes(updatedFact.totalUpvotes);
-            setDownvotes(updatedFact.totalDownvotes);
-            setFact(updatedFact);
-            console.log(updatedFact);
+            const updatedFacts = pastFacts.map(fact => {
+                if (fact._id === factId) {
+                    return {
+                        ...fact,
+                        totalUpvotes: updatedFact.totalUpvotes,
+                        totalDownvotes: updatedFact.totalDownvotes
+                    };
+                }
+                return fact;
+            });
+            setPastFacts(updatedFacts);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
@@ -224,7 +236,7 @@ export default function PastFacts() {
                     <button onClick={() => navigate("/login")}>Login</button>
                 </form>
             </dialog>}
-            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.userId}`)} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
+            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.user_id}`)} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>

@@ -1,11 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './ProfilePage.module.css';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUpvoteFactRequest } from "../requests/getUpvoteFactRequest";
 import { getDownvoteFactRequest } from "../requests/getDownvoteFactRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
 import Navbar from '../components/Nabar';
+import { UserContext } from "../context/UserContext";
+import { authRequest } from "../requests/authRequest";
+import { logoutRequest } from "../requests/logoutRequest";
 
 const ProfilePage = () => {
     const { username } = useParams();
@@ -13,8 +16,27 @@ const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState('comments');
     const [userName, setUserName] = useState('');
     const navigate = useNavigate();
+    const {currentUser, setCurrentUser} = useContext(UserContext);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     
     useEffect(() => {
+        const auth = async () => {
+            if(!localStorage.getItem("token")) {
+                return;
+            }
+
+            if(JSON.stringify(currentUser) === "{}") {
+                try {
+                    // make auth request
+                    const data = await authRequest();
+                    setCurrentUser(data);
+                    console.log(data);
+                    setIsUserLoggedIn(true);
+                } catch (err) {
+                    console.log(err);
+                }
+            }
+        }
         
         async function fetchUserName() {
             try {
@@ -29,6 +51,7 @@ const ProfilePage = () => {
         async function helper() {
             await fetchUserName();
             await fetchData("comments");
+            await auth();
         }
 
         helper();
@@ -56,6 +79,18 @@ const ProfilePage = () => {
         setFacts(data);
     };
 
+    async function logoutHandler() {
+        console.log("user logout...")
+        try {
+            await logoutRequest(currentUser.email);
+            localStorage.removeItem("token");
+            setCurrentUser({});
+            navigate("/login");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     // Function to handle tab changes
     const handleTabChange = async (tab) => {
         setActiveTab(tab);
@@ -64,7 +99,7 @@ const ProfilePage = () => {
 
     return (
         <div>
-            <Navbar primaryButton="Home" primaryButtonOnClick={() => navigate("/")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />
+            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="Past Facts" thirdButtonOnClick={() => navigate("/all-facts")} /> : <Navbar primaryButton="Home" primaryButtonOnClick={() => navigate("/")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="Logout" thirdButtonOnClick={() => logoutHandler()} />}
             <div className={styles.container}>
                 <div>
                     <h1>Profile: {userName}</h1>
