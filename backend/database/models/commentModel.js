@@ -27,6 +27,14 @@ const commentSchema = new Schema ({
     comment:{
         type: String,
         required: true
+    },
+    totalUpvotes: {
+        type: Number,
+        required: true,
+    },
+    totalDownvotes: {
+        type: Number,
+        required: true
     }
 }, {timestamps: true})
 

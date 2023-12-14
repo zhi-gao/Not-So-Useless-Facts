@@ -93,6 +93,15 @@ async function findFactsById(factIds) {
     }
 }
 
+async function findCommentByIds(commentIds) {
+    try {
+        const comments = await Comment.findById(commentIds);
+        return comments;
+    } catch (err) {
+        throw err;
+    }
+}
+
 async function findCommentsByIds(commentIds) {
     try {
         const comments = await Comment.find({_id: {$in: commentIds }});
@@ -110,5 +119,6 @@ module.exports = {
     findUserById,
     findFactById,
     findFactsById,
+    findCommentByIds,
     findCommentsByIds,
 }

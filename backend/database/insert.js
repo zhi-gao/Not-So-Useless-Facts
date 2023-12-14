@@ -43,9 +43,9 @@ async function updateRefreshToken(userEmail, token) {
     }
 }
 
-async function insertComment({factId, userId, comment}) {
+async function insertComment({factId, userId, comment, totalUpvotes, totalDownvotes}) {
     try {
-        const createComment = await Comment.create({factId, userId, comment})
+        const createComment = await Comment.create({factId, userId, comment, totalUpvotes, totalDownvotes})
 
         // update Fact
         await Fact.findByIdAndUpdate(
