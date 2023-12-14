@@ -18,7 +18,6 @@ function App() {
         <Route exact path='/register' element={<Register />}/>
         <Route exact path='/about' element={<About />}/>
         <Route exact path='/all-facts' element={<PastFacts />}/>
-        <Route exact path='/profile' element={<Profile />}/>
         <Route path="/profile/:username" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>

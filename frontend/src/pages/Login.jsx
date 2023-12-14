@@ -27,14 +27,14 @@ export default function Login() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
-                    navigate("/profile");
+                    navigate(`/profile/${data.user_id}`);
                 } catch (err) {
                     setLoading(false);
                 }
             }
 
             else {
-                navigate("/profile");
+                navigate(`/profile/${currentUser.user_id}`);
             }
         }
 
@@ -65,7 +65,7 @@ export default function Login() {
             console.log(data);
             localStorage.setItem("token", data.accessToken);
             setCurrentUser(data);
-            navigate("/profile");
+            navigate(`/profile/${data.user_id}`);
         } catch (err) {
             console.error(err);
             setErrorMessage("Internal Server Error");
@@ -81,7 +81,7 @@ export default function Login() {
     return <div>
         <Navbar primaryButton="Home" primaryButtonOnClick={() => navigate("/")} 
             secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}
-            thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />
+            thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")}  />
 
         <div className={styles.flexContainer}>
             <form onSubmit={submitHandler} className={styles.container}>
