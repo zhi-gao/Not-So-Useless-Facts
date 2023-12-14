@@ -8,6 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
+import { factUpvoteRequest } from "../requests/factUpvoteRequest";
+import { factDownvoteRequest } from "../requests/factDownvoteRequest";
+import { postCommentRequest } from "../requests/postCommentRequest";
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
 
@@ -15,15 +18,18 @@ export default function PastFacts() {
     const navigate = useNavigate();
     const {currentUser, setCurrentUser} = useContext(UserContext);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    const [pastFacts, setPastFacts] = useState([]);
-    const [sortBy, setSortBy] = useState('latest'); // 'latest' or 'oldest'
-    const portalContainerRef = useRef(null);
-    const [newComment, setNewComment] = useState("");
+    const [upvotes, setUpvotes] = useState(0);
+    const [downvotes, setDownvotes] = useState(0);
     const [factComments, setFactComments] = useState({});
     const [isFactFlagged, setIsFactFlagged] = useState(false);
     const [showFactReportModal, setShowFactReportModal] = useState(false);
     const [isUserFlagged, setIsUserFlagged] = useState(false);
     const [showUserReportModal, setShowUserReportModal] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const portalContainerRef = useRef(null);
+    const [pastFacts, setPastFacts] = useState([]);
+    const [newComment, setNewComment] = useState("");
+    const [sortBy, setSortBy] = useState('latest');
 
     useEffect(() => {
         const auth = async () => {
@@ -36,6 +42,7 @@ export default function PastFacts() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
+                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
                     console.log(err);
@@ -43,6 +50,7 @@ export default function PastFacts() {
             }
         }
 
+        {/** Fetch past facts */}
         async function fetchPastFacts() {
             try {
                 const response = await fetch('http://localhost:4000/facts');
@@ -121,38 +129,58 @@ export default function PastFacts() {
         setSortBy(value);
     };
 
-    const handleUpvote = (factId) => {
-        setPastFacts((prevFacts) =>
-            prevFacts.map((fact) =>
-                fact._id === factId ? { ...fact, upvotes: fact.upvotes + 1 } : fact
-            )
-        );
-    };
+    async function factUpvoteHandler(factId) {
+        if(!factId) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
 
-    const handleDownvote = (factId) => {
-        setPastFacts((prevFacts) =>
-            prevFacts.map((fact) =>
-                fact._id === factId ? { ...fact, downvotes: fact.downvotes + 1 } : fact
-            )
-        );
-    };
+        try {
+            const updatedFact = await factUpvoteRequest(factId, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
+            console.log(updatedFact);
+        } catch(err) {
+            console.error(err);
+        }
+    }
 
-    const handleCommentSubmit = (factId) => {
-        setPastFacts((prevFacts) =>
-            prevFacts.map((fact) =>
-                fact._id === factId
-                    ? {
-                          ...fact,
-                          comments: [
-                              ...fact.comments,
+    async function factDownvoteHandler(factId) {
+        if(!factId) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
 
-                          ],
-                      }
-                    : fact
-            )
-        );
-        setNewComment("");
-    };
+        try {
+            const updatedFact = await factDownvoteRequest(factId, currentUser.user_id);
+            setUpvotes(updatedFact.totalUpvotes);
+            setDownvotes(updatedFact.totalDownvotes);
+            setFact(updatedFact);
+            console.log(updatedFact);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleCommentSubmit = async (factId) => {
+        if(newComment === "") return;
+
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const res = await postCommentRequest(factId, currentUser.user_id, newComment);
+            console.log(res);
+            console.log(comments);
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const handleFactFlagClick = (factId) => {
         setIsFactFlagged(true);
@@ -186,7 +214,15 @@ export default function PastFacts() {
     };
 
     return (
-        <div>
+            <div>
+            {(showLoginModal || showUserReportModal || showFactReportModal) && <div className={styles.backdrop}></div>}
+            {showLoginModal && <dialog open className={styles.loginDialog}>
+                <p>You have to login in order to perform this action</p>
+                <form method="dialog">  
+                    <button onClick={() => setShowLoginModal(false)}>OK</button>
+                    <button onClick={() => navigate("/login")}>Login</button>
+                </form>
+            </dialog>}
             {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
                 <div>
@@ -212,11 +248,11 @@ export default function PastFacts() {
                             
                             <div className={styles.iconsRow}>
                                 {/** Upvote Fact Button */}
-                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => handleUpvote(fact._id)} />
+                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => factUpvoteHandler(fact._id)} />
                                 <span>{fact.totalUpvotes}</span>
 
                                 {/** Downvote Fact Button */}
-                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => handleDownvote(fact._id)} />
+                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => factDownvoteHandler(fact._id)} />
                                 <span>{fact.totalDownvotes}</span>
 
                                 {/** Comment Fact Button */}
@@ -257,11 +293,11 @@ export default function PastFacts() {
                                             <div className={styles.iconsContainer}>
                                                 {/** Upvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {}} />
-                                                <span>{comment.upvotes}</span>
+                                                <span>{comment.totalUpvotes}</span>
 
                                                 {/** Downvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => {}} />
-                                                <span>{comment.downvotes}</span>
+                                                <span>{comment.totalDownvotes}</span>
 
                                                 {/** Flag User Button */}
                                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />

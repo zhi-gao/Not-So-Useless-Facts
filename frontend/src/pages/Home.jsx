@@ -29,8 +29,6 @@ export default function Home() {
     const [showUserReportModal, setShowUserReportModal] = useState(false);
     const [showLoginModal, setShowLoginModal] = useState(false);
     const portalContainerRef = useRef(null);
-
-    {/** Fetch today's fact */}
     const [fact, setFact] = useState({});
     const [newComment, setNewComment] = useState("");
 
@@ -53,6 +51,7 @@ export default function Home() {
             }
         }
 
+        {/** Fetch today's fact */}
         async function fetchFact() {
             try {
                 const response = await axios.get("http://localhost:4000/facts/today");
@@ -244,11 +243,11 @@ export default function Home() {
                             <div className={styles.iconsContainer}>
                                 {/** Upvote Comment Button */}
                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {comment.upvotesotes}} />
-                                <span>{comment.upvotes}</span>
+                                <span>{comment.totalUpvotes}</span>
 
                                 {/** Downvote Comment Button */}
                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => {comment.downvotes}} />
-                                <span>{comment.downvotes}</span>
+                                <span>{comment.totalDownvotes}</span>
 
                                 {/** Flag User Button */}
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
