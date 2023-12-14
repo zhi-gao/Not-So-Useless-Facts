@@ -93,7 +93,7 @@ async function findFactsById(factIds) {
     }
 }
 
-async function findCommentByIds(commentIds) {
+async function findCommentById(commentIds) {
     try {
         const comments = await Comment.findById(commentIds);
         return comments;
@@ -119,6 +119,6 @@ module.exports = {
     findUserById,
     findFactById,
     findFactsById,
-    findCommentByIds,
+    findCommentById,
     findCommentsByIds,
 }
