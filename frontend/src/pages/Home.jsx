@@ -85,6 +85,11 @@ export default function Home() {
     }, []);
 
     const handleFactFlagClick = () => {
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
         setIsFactFlagged(true);
         setShowFactReportModal(true);
     };
@@ -95,6 +100,11 @@ export default function Home() {
     };
 
     const handleUserFlagClick = () => {
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+        
         setIsUserFlagged(true);
         setShowUserReportModal(true);
     };
@@ -319,7 +329,8 @@ export default function Home() {
 
             {/** Portal for Fact Report Modal */}
             {showFactReportModal && portalContainerRef.current && (
-                    <FactReportModal onClose={handleCloseFactReportModal} />
+                    <FactReportModal onClose={handleCloseFactReportModal}
+                    currentUserId={currentUser.user_id} reportFactId={fact._id} />
             )}
 
             {/** Portal for User Report Modal */}

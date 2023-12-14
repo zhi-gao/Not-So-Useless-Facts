@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import styles from "../components/ReportModal.module.css";
+import { reportRequest } from "../requests/reportRequest";
 
-const FactReportModal = ({ onClose }) => {
+const FactReportModal = ({ onClose, currentUserId, reportFactId }) => {
   const [reportReason, setReportReason] = useState(""); // State to manage selected report reason
   const [details, setDetails] = useState(""); // State to manage input details
 
-  const handleReportSubmit = () => {
+  const handleReportSubmit = async () => {
     // Handle submission logic here, you can send the report data to the server or perform other actions
-    console.log("Fact Report Reason:", reportReason);
-    console.log("Details:", details);
+    try {
+        const res = await reportRequest(currentUserId, reportFactId, "Fact", reportReason, details);
+        console.log(res);
+    } catch (err) {
+        console.log(err);
+    }
 
     // Close the modal after submitting
     onClose();

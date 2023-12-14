@@ -495,8 +495,7 @@ async function getCommentsController(req, res){
     Check if exist
 */
 async function reportController(req, res){
-    // const {userId, recipientId, recipientType, flag} = req.body;
-    const {userId, recipientId, recipientType, flag, comment} = req.query;
+    const {userId, recipientId, recipientType, flag, comment} = req.body
     console.log(req.query)
     recipientExist = "None";
 
