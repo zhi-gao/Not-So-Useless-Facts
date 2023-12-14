@@ -109,6 +109,7 @@ export default function PastFacts() {
                     }
     
                     setPastFacts(updatedFacts);
+                    console.log(updatedFacts);
                 } else {
                     console.error('Failed to fetch past facts');
                 }
@@ -223,7 +224,7 @@ export default function PastFacts() {
                     <button onClick={() => navigate("/login")}>Login</button>
                 </form>
             </dialog>}
-            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
+            {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.userId}`)} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>
@@ -244,6 +245,7 @@ export default function PastFacts() {
                     {/** Past Facts */}
                     {pastFacts.map((fact) => (
                         <div key={fact._id} className={styles.factContent}>
+                            <div style={{fontSize : "20px"}}>Date: {new Date(fact.createdAt).toDateString()}</div>
                             Did you know: {fact.fact}
                             
                             <div className={styles.iconsRow}>
@@ -263,7 +265,6 @@ export default function PastFacts() {
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleFactFlagClick(fact._id)} />
                                 <span>{isFactFlagged}Flag</span>
                             </div>
-
                             {/** Comments */}
                             {factComments[fact._id] && (
                                 <div className={styles.commentsContainer}>

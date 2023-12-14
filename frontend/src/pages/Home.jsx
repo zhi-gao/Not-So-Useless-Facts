@@ -14,6 +14,7 @@ import { factDownvoteRequest } from "../requests/factDownvoteRequest";
 import { postCommentRequest } from "../requests/postCommentRequest";
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
+import { logoutRequest } from "../requests/logoutRequest";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function Home() {
     const portalContainerRef = useRef(null);
     const [fact, setFact] = useState({});
     const [newComment, setNewComment] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const auth = async () => {
@@ -71,6 +73,8 @@ export default function Home() {
         async function helper() {
             await fetchFact();
             await auth();
+
+            setLoading(false);
         }
         
         helper();
@@ -174,9 +178,24 @@ export default function Home() {
         }
     }
 
-    const handleUserClick = (username) => {
-        navigate(`/profile/${username}`);
+    async function logoutHandler() {
+        try {
+            await logoutRequest(currentUser.email);
+            localStorage.removeItem("token");
+            setCurrentUser({});
+            navigate("/login");
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const handleUserClick = (id) => {
+        navigate(`/profile/${id}`);
     };
+
+    if(loading) {
+        return <div>Loading...</div>
+    }
 
     return <div>
         {(showLoginModal || showUserReportModal || showFactReportModal) && <div className={styles.backdrop}></div>}
@@ -187,7 +206,7 @@ export default function Home() {
                 <button onClick={() => navigate("/login")}>Login</button>
             </form>
         </dialog>}
-        {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate("/profile")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
+        {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.user_id}`)} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
         <div className={`${styles.flexContainer} ${styles.factSection}`}>
             <div>
