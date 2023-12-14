@@ -30,6 +30,7 @@ export default function PastFacts() {
     const [pastFacts, setPastFacts] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [sortBy, setSortBy] = useState('latest');
+    const [selectedFactId, setSelectedFactId] = useState(null);
 
     useEffect(() => {
         const auth = async () => {
@@ -235,6 +236,12 @@ export default function PastFacts() {
     }
 
     const handleFactFlagClick = (factId) => {
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        setSelectedFactId(factId);
         setIsFactFlagged(true);
         setShowFactReportModal(true);
     };
@@ -245,6 +252,11 @@ export default function PastFacts() {
     };
 
     const handleUserFlagClick = () => {
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+        
         setIsUserFlagged(true);
         setShowUserReportModal(true);
     };
@@ -364,7 +376,8 @@ export default function PastFacts() {
 
                     {/** Portal for Fact Report Modal */}
                     {showFactReportModal && portalContainerRef.current && (
-                            <FactReportModal onClose={handleCloseFactReportModal} />
+                            <FactReportModal onClose={handleCloseFactReportModal}
+                            currentUserId={currentUser.user_id} reportFactId={selectedFactId} />
                     )}
 
                     {/** Portal for User Report Modal */}
