@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUp, faAnglesDown, faCommentDots, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
+import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
+import { getUsernameRequest } from "../requests/getUsernameRequest";
 
 export default function PastFacts() {
     const navigate = useNavigate();
@@ -54,12 +56,22 @@ export default function PastFacts() {
                         return factDate !== today;
                     });
                     
-                    // Update each fact with totalUpvotes and totalDownvotes from the fetched JSON
-                    const updatedFacts = data.map(fact => ({
-                        ...fact,
-                        upvotes: fact.totalUpvotes,
-                        downvotes: fact.totalDownvotes,
-                        commentCount: fact.comments.length,
+                    // Update each fact with comments from the fetched JSON
+                    const updatedFacts = await Promise.all(data.map(async fact => {
+                        const factComments = await getFactCommentsRequest(fact._id);
+                        const commentsWithUsernames = await Promise.all(factComments.map(async comment => {
+                            const user = await getUsernameRequest(comment.userId);
+                            return {
+                                ...comment,
+                                userId: comment.userId,
+                                userName: user,
+                                comment: comment.comment
+                            };
+                        }));
+                        return {
+                            ...fact,
+                            comments: commentsWithUsernames
+                        };
                     }));
 
                     // Sort the facts based on the selected sorting option
@@ -162,7 +174,7 @@ export default function PastFacts() {
         setShowUserReportModal(false);
     };
 
-    const handleToggleComments = (factId) => {
+    const handleShowComments = (factId) => {
         setFactComments((prevComments) => ({
             ...prevComments,
             [factId]: !prevComments[factId],
@@ -179,7 +191,7 @@ export default function PastFacts() {
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>
-
+                    {/** Sort Facts */}
                     <div className={styles.sortRow}>
                         <label>
                             Sort by:
@@ -193,26 +205,33 @@ export default function PastFacts() {
                         </label>
                     </div>
 
+                    {/** Past Facts */}
                     {pastFacts.map((fact) => (
                         <div key={fact._id} className={styles.factContent}>
                             Did you know: {fact.fact}
                             
                             <div className={styles.iconsRow}>
+                                {/** Upvote Fact Button */}
                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => handleUpvote(fact._id)} />
-                                <span>{fact.upvotes}</span>
+                                <span>{fact.totalUpvotes}</span>
 
+                                {/** Downvote Fact Button */}
                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => handleDownvote(fact._id)} />
-                                <span>{fact.downvotes}</span>
+                                <span>{fact.totalDownvotes}</span>
 
-                                <FontAwesomeIcon icon={faCommentDots} onClick={() => handleToggleComments(fact._id)} />
+                                {/** Comment Fact Button */}
+                                <FontAwesomeIcon icon={faCommentDots} onClick={() => handleShowComments(fact._id)} />
                                 <span>{fact.comments.length}</span>
 
+                                {/** Flag Fact Button */}
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleFactFlagClick(fact._id)} />
                                 <span>{isFactFlagged}Flag</span>
                             </div>
 
+                            {/** Comments */}
                             {factComments[fact._id] && (
                                 <div className={styles.commentsContainer}>
+                                    {/** Add a new comment */}
                                     <div>
                                         <textarea
                                             rows="4"
@@ -224,22 +243,27 @@ export default function PastFacts() {
                                         <button onClick={() => handleCommentSubmit(fact._id)}>Submit</button>
                                     </div>
 
+                                    {/** Show comments */}
+                                    <div><strong><h2>Comments</h2></strong></div>
                                     {fact.comments.map((comment, index) => (
                                         <div key={index}>
                                             <div>
                                                 <strong>
-                                                    <a href="#" onClick={() => handleUserClick(comment.username)}>
-                                                        {comment.username}
+                                                    <a href="#" onClick={() => handleUserClick(comment.userId)}>
+                                                        {comment.userName}
                                                     </a>
-                                                </strong>: {comment.content}
+                                                </strong>: {comment.comment}
                                             </div>
-                                            <div>
+                                            <div className={styles.iconsContainer}>
+                                                {/** Upvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {}} />
                                                 <span>{comment.upvotes}</span>
 
+                                                {/** Downvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => {}} />
                                                 <span>{comment.downvotes}</span>
 
+                                                {/** Flag User Button */}
                                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
                                                 <span>{isUserFlagged}Flag</span>
                                             </div>
