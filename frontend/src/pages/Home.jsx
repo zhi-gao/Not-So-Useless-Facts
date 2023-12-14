@@ -190,10 +190,6 @@ export default function Home() {
         }
 
         try {
-<<<<<<< Updated upstream
-            console.log("comment id:", comment._id);
-=======
->>>>>>> Stashed changes
             const updatedComment = await commentUpvoteRequest(comment._id, currentUser.user_id);
             // setCommentUpvotes(updatedComment.totalUpvotes);
             // setCommentDownvotes(updatedComment.totalDownvotes);
