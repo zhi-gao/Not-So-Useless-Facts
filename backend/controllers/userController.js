@@ -227,7 +227,7 @@ async function getUserController(req, res) {
  * if already upvoted, remove from user.upvotecomments, decrement comment.upvote
  */
 async function upvoteCommentController(req, res) {
-    const {userId, commentId} = req.query
+    const {userId, commentId} = req.body
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){
@@ -316,8 +316,7 @@ async function upvoteCommentController(req, res) {
  * if already downvoted, remove from user.downvotecomments, decrement comment.downvote
  */
 async function downvoteCommentController(req, res) {
-    // const {userId, commentId} = req.body
-    const { userId, commentId } = req.query;
+    const { userId, commentId } = req.body
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){

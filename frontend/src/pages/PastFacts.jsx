@@ -10,6 +10,8 @@ import FactReportModal from "../components/FactReportModal";
 import UserReportModal from "../components/UserReportModal";
 import { factUpvoteRequest } from "../requests/factUpvoteRequest";
 import { factDownvoteRequest } from "../requests/factDownvoteRequest";
+import { commentUpvoteRequest } from "../requests/commentUpvoteRequest";
+import { commentDownvoteRequest } from "../requests/commentDownvoteRequest";
 import { postCommentRequest } from "../requests/postCommentRequest";
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
@@ -178,6 +180,43 @@ export default function PastFacts() {
         }
     }
 
+    async function commentUpvoteHandler(comment) {
+        if(!comment) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const updatedComment = await commentUpvoteRequest(comment._id, currentUser.user_id);
+            // setCommentUpvotes(updatedComment.totalUpvotes);
+            // setCommentDownvotes(updatedComment.totalDownvotes);
+            // setFact(updatedComment);
+            console.log(updatedComment);
+        } catch(err) {
+            console.error(err);
+        }
+    }
+
+    async function commentDownvoteHandler(comment) {
+        if(!comment) return;
+        if(JSON.stringify(currentUser) === "{}") {
+            setShowLoginModal(true);
+            return;
+        }
+
+        try {
+            const updatedComment = await commentDownvoteRequest(comment._id, currentUser.user_id);
+            // setCommentUpvotes(updatedComment.totalUpvotes);
+            // setCommentDownvotes(updatedComment.totalDownvotes);
+            // setFact(updatedComment);
+            console.log(updatedComment);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
     const handleCommentSubmit = async (factId) => {
         if(newComment === "") return;
 
@@ -305,11 +344,11 @@ export default function PastFacts() {
                                             </div>
                                             <div className={styles.iconsContainer}>
                                                 {/** Upvote Comment Button */}
-                                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => {}} />
+                                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => commentUpvoteHandler(comment)} />
                                                 <span>{comment.totalUpvotes}</span>
 
                                                 {/** Downvote Comment Button */}
-                                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => {}} />
+                                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => commentDownvoteHandler(comment)} />
                                                 <span>{comment.totalDownvotes}</span>
 
                                                 {/** Flag User Button */}
