@@ -1,3 +1,5 @@
+/* Default styles for all screen sizes */
+
 #navbar {
     display: flex;
     align-items: center;
@@ -19,4 +21,20 @@
     color: white;
     background-color: black;
     border: 1px solid black;
+}
+
+/* Media query for smaller screens, such as mobile devices */
+@media screen and (max-width: 768px) {
+    #navbar {
+        justify-content: flex-end;
+        margin-right: 0;
+        padding-top: 5px;
+    }
+
+    #navbar button {
+        margin: 3px;
+        width: 75px;
+        height: 25px;
+        font-size: 12px;
+    }
 }

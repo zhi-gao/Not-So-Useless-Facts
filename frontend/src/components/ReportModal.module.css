@@ -1,52 +1,52 @@
-/* ReportModal.module.css */
+/* Default styles for all screen sizes */
 
 .reportModal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    max-width: 400px;
-    width: 90%;
-    text-align: left;
-  }
-  
-  .reportModal h2 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-  }
-  
-  .reportModal label {
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  .reportModal textarea {
-    width: 100%;
-    height: 100px;
-    resize: vertical;
-    margin-bottom: 15px;
-  }
-  
-  .reportModal .buttonContainer {
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .reportModal button {
-    margin-left: 10px;
-    padding: 8px 12px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    background-color: #333;
-    color: white;
-  }
-  
-  .reportModal button:hover {
-    background-color: #555;
-  }
-  
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 15px;
+  background-color: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 320px;
+  width: 90%;
+  text-align: left;
+}
+
+.reportModal h2 {
+  font-size: 1em;
+  margin-bottom: 8px;
+}
+
+.reportModal label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.reportModal textarea {
+  width: 100%;
+  height: 80px;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+.reportModal .buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reportModal button {
+  margin-left: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  background-color: #333;
+  color: white;
+  font-size: 0.9em;
+}
+
+.reportModal button:hover {
+  background-color: #555;
+}
