@@ -6,7 +6,7 @@ const SALT_ROUNDS = 10
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { default: mongoose } = require('mongoose')
-const { findUserWithEmail, userExists, findFactById, findUserById, findCommentsByIds } = require('../database/fetch')
+const { findUserWithEmail, userExists, findFactById, findUserById, findCommentByIds, findCommentsByIds } = require('../database/fetch')
 const { insertUser, insertComment, updateRefreshToken } = require('../database/insert')
 const { removeRefreshToken } = require('../database/delete')
 
@@ -218,21 +218,191 @@ async function getUserController(req, res) {
 
 
 // COMMENTS CONTROLLERS
-
-/**
- * Upvote comment controller 
- * Functionality of a user clicking the upvote a comment goes here
- */
-async function upvoteCommentController(req, res) {
-
+async function test(req, res){
+    const { id } = req.body;
+    console.log("test: ", id)
+    return res.json({msg: id})
 }
 
-/**
- * Downvote comment controller 
- * Functionality of a user clicking the downvote a comment goes here
+
+/*
+ * User upvote comment
+ * Requires: Userid, CommentId
+ * Steps:
+ * Validate both ids and check for existance
+ * find if the user already upvoted/downvoted comment
+ * if already upvoted, remove from user.upvotecomments, decrement comment.upvote
+ */
+async function upvoteCommentController(req, res) {
+    const {userId, commentId} = req.body
+    console.log(userId)
+    console.log(commentId)
+
+    // Make sure id is mongoose valid
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: `User ${userId} invalid`})
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(commentId)){
+        return res.status(404).json({error: `Comment ${commentId} invalid`})
+    }
+
+    // Find existance of user and comment
+    const userExist = await findUserById(userId)
+
+    if(!userExist){
+        res.status(404).json({error: `${userId} does not exist`})
+    }
+
+    const commentExist = await findCommentById(commentId)
+
+    if(!commentExist){
+        res.status(404).json({error: `${commentId} does not exist`})
+    }
+
+    try{
+        //check if user already upvoted/downvoted
+        upvoteExist = userExist.upvotedComments.includes(commentId)
+        downvoteExist = userExist.downvotedComments.includes(commentId)
+
+        // if commentId doesnt exist in either, add to login.upvoteComments and increment comment.upvote
+        if(!upvoteExist && !downvoteExist){
+            // add commentId to user.upvotedComment
+            userExist.upvotedComments.push(commentId);
+            await userExist.save();
+
+            // increment comment.upvote
+            commentExist.totalUpvotes += 1;
+            await commentExist.save();
+
+            return res.status(200).json({msg: commentExist})
+        }
+        
+        // if commentId only exist in upvote, remove from login.upvotedComment and decrement comment.upvote
+        if(upvoteExist && !downvoteExist){
+            // remvoe commentId from user.upvotedComment
+            userExist.upvotedComments.pull(commentId);
+            await userExist.save();
+
+            // decrement comment.upvote
+            commentExist.totalUpvotes -= 1;
+            await commentExist.save()
+
+            return res.status(200).json({msg: commentExist})
+        }
+
+        // if commentId only exist in downvote, remove from login.downvoteComments, add to login.upvoteComment, decrement comment.downvote, increment comment.upvote
+        if(!upvoteExist && downvoteExist){
+            // remove commentId from user.downvoteComments and add to user.upvoteComments
+            userExist.downvotedComments.pull(commentId);
+            userExist.upvotedComments.push(commentId);
+            await userExist.save();
+
+            // increment comment.upvoteComments and decrement comment.downvoteComments
+            commentExist.totalDownvotes -= 1;
+            commentExist.totalUpvotes += 1;
+            await commentExist.save()
+
+            return res.status(200).json({msg: commentExist})
+        }
+
+        if (upvoteExist && downvoteExist) {
+            throw new Error('Comment exists in both upvote and downvote.');
+        }
+
+    }catch (err){
+        console.error(err)
+        return res.status(404).json({error: error.message})
+    }
+}
+
+/*
+ * User downvote comment
+ * Requires: Userid, CommentId
+ * Steps:
+ * Validate both ids and check for existance
+ * find if the user already upvoted/downvoted comment
+ * if already downvoted, remove from user.downvotecomments, decrement comment.downvote
  */
 async function downvoteCommentController(req, res) {
+    const {userId, commentId} = req.body
 
+    // Make sure id is mongoose valid
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(404).json({error: `User ${userId} invalid`})
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(commentId)){
+        return res.status(404).json({error: `Comment ${commentId} invalid`})
+    }
+
+    // Find existance of user and comment
+    const userExist = await findUserById(userId)
+
+    if(!userExist){
+        res.status(404).json({error: `${userId} does not exist`})
+    }
+
+    const commentExist = await findCommentById(commentId)
+
+    if(!commentExist){
+        res.status(404).json({error: `${commentId} does not exist`})
+    }
+
+    try{
+        //check if user already upvoted/downvoted
+        upvoteExist = userExist.upvotedComments.includes(commentId)
+        downvoteExist = userExist.downvotedComments.includes(commentId)
+
+        // if commentId doesnt exist in either, add to login.downvoteComments and increment comment.downvote
+        if(!upvoteExist && !downvoteExist){
+            // add commentId to user.downvotedComment
+            userExist.downvotedComments.push(commentId);
+            await userExist.save();
+
+            // increment comment.upvote
+            commentExist.totalDowvotes += 1;
+            await commentExist.save();
+
+            return res.status(200).json({msg: commentExist})
+        }
+        
+        // if commentId only exist in downvote, remove from login.downvotedComment and decrement comment.downvote
+        if(!upvoteExist && downvoteExist){
+            // remvoe commentId from user.upvotedComment
+            userExist.downvotedComments.pull(commentId);
+            await userExist.save();
+
+            // decrement comment.upvote
+            commentExist.totalDownvotes -= 1;
+            await commentExist.save()
+
+            return res.status(200).json({msg: commentExist})
+        }
+
+        // if commentId only exist in upvote, remove from login.upvoteComments, add to login.downvoteComment, decrement comment.upvote, increment comment.downvote
+        if(upvoteExist && !downvoteExist){
+            // remove commentId from user.downvoteComments and add to user.upvoteComments
+            userExist.upvotedComments.pull(commentId);
+            userExist.downvotedComments.push(commentId);
+            await userExist.save();
+
+            // increment comment.upvoteComments and decrement comment.downvoteComments
+            commentExist.totalUpvotes -= 1;
+            commentExist.totalDownvotes += 1;
+            await commentExist.save()
+
+            return res.status(200).json({msg: commentExist})
+        }
+
+        if (upvoteExist && downvoteExist) {
+            throw new Error('Comment exists in both upvote and downvote.');
+        }
+
+    }catch (err){
+        console.error(err)
+        return res.status(404).json({error: error.message})
+    }
 }
 
 /**
@@ -268,7 +438,10 @@ async function postCommentController(req, res) {
         const newComment = await insertComment({
                                 userId: userId, 
                                 factId: factId, 
-                                comment: comment})
+                                comment: comment,
+                                totalUpvotes: 0,
+                                totalDownvotes: 0
+                                })
         
         console.log(newComment);
         return res.json(newComment)
@@ -329,4 +502,5 @@ module.exports = {
     downvoteCommentController,
     postCommentController,
     getCommentsController,
+    test
 }

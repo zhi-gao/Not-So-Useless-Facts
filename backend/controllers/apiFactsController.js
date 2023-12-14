@@ -65,18 +65,18 @@ async function factOfTheDayController(_, res) {
  * find existence of fact
  * find existence of user
  * find if the user already upvoted/downvoted fact
- * if already upvoted, remove from user.upvotecomments, decrement fact.upvote
+ * if already upvoted, remove from user.upvotecfacts, decrement fact.upvote
  */
 async function upvoteFactController(req, res) {
     const {userId, factId} = req.body
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(userId)){
-        return res.status(404).json({error: "User Id invalid"})
+        return res.status(404).json({error: `User ${userId} invalid`})
     }
 
     if(!mongoose.Types.ObjectId.isValid(factId)){
-        return res.status(404).json({error: "Fact Id invalid"})
+        return res.status(404).json({error: `Fact ${factId} invalid`})
     }
 
     // Find existance of user and fact
@@ -127,7 +127,7 @@ async function upvoteFactController(req, res) {
         if(!upvoteExist && downvoteExist){
             // remove factId from user.downvoteFacts and add to user.upvoteFacts
             userExist.downvotedFacts.pull(factId);
-            userExist.upvotedFacts.push(factId)
+            userExist.upvotedFacts.push(factId);
             await userExist.save();
 
             // increment fact.upvoteFacts and decrement fact.downvoteFacts
@@ -157,7 +157,7 @@ async function upvoteFactController(req, res) {
  * find existence of fact
  * find existence of user
  * find if the user already upvoted/downvoted fact
- * if already downvoted, remove fro muser.downvotecomments, decrement fact.downvote
+ * if already downvoted, remove fro muser.downvotefacts, decrement fact.downvote
  */
 async function downvoteFactController(req, res) {
     const {userId, factId} = req.body
@@ -286,7 +286,7 @@ Return them
 */
 async function getUserUpvoteFactsController(req, res){
     const { id } = req.body
-
+    console.log(id)
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: `${id} is invalid`})
@@ -361,5 +361,5 @@ module.exports = {
     downvoteFactController,
     getFactsController,
     getUserUpvoteFactsController,
-    getUserDownvoteFactsController
+    getUserDownvoteFactsController,
 }
