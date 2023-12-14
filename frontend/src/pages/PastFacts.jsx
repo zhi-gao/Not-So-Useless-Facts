@@ -16,7 +16,7 @@ export default function PastFacts() {
     const {currentUser, setCurrentUser} = useContext(UserContext);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [pastFacts, setPastFacts] = useState([]);
-    const [sortBy, setSortBy] = useState('latest'); // 'latest' or 'oldest'
+    const [sortBy, setSortBy] = useState('latest');
     const portalContainerRef = useRef(null);
     const [newComment, setNewComment] = useState("");
     const [factComments, setFactComments] = useState({});
@@ -257,11 +257,11 @@ export default function PastFacts() {
                                             <div className={styles.iconsContainer}>
                                                 {/** Upvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {}} />
-                                                <span>{comment.upvotes}</span>
+                                                <span>{comment.totalUpvotes}</span>
 
                                                 {/** Downvote Comment Button */}
                                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => {}} />
-                                                <span>{comment.downvotes}</span>
+                                                <span>{comment.totalDownvotes}</span>
 
                                                 {/** Flag User Button */}
                                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />

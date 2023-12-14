@@ -16,6 +16,14 @@ const commentSchema = new Schema ({
         type : mongoose.Types.ObjectId,
         required: true
     },
+    totalUpvotes: {
+        type: Number,
+        required: true,
+    },
+    totalDownvotes : {
+        type: Number,
+        required: true
+    },
     comment:{
         type: String,
         required: true

@@ -244,11 +244,11 @@ export default function Home() {
                             <div className={styles.iconsContainer}>
                                 {/** Upvote Comment Button */}
                                 <FontAwesomeIcon icon={faAnglesUp} onClick={() => {comment.upvotesotes}} />
-                                <span>{comment.upvotes}</span>
+                                <span>{comment.totalUpvotes}</span>
 
                                 {/** Downvote Comment Button */}
                                 <FontAwesomeIcon icon={faAnglesDown} onClick={() => {comment.downvotes}} />
-                                <span>{comment.downvotes}</span>
+                                <span>{comment.totalDownvotes}</span>
 
                                 {/** Flag User Button */}
                                 <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
