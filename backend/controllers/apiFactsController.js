@@ -286,7 +286,6 @@ Return them
 */
 async function getUserUpvoteFactsController(req, res){
     const { id } = req.body
-    console.log(id)
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: `${id} is invalid`})
@@ -326,7 +325,6 @@ Return them
 */
 async function getUserDownvoteFactsController(req, res){
     const { id } = req.body
-    console.log(id)
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: `${id} is invalid`})

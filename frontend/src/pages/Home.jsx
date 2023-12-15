@@ -37,6 +37,7 @@ export default function Home() {
     const [fact, setFact] = useState({});
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(true);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
         const auth = async () => {
@@ -99,12 +100,13 @@ export default function Home() {
         setShowFactReportModal(false);
     };
 
-    const handleUserFlagClick = () => {
+    const handleUserFlagClick = (userId) => {
         if(JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);
             return;
         }
-        
+
+        setSelectedUserId(userId);
         setIsUserFlagged(true);
         setShowUserReportModal(true);
     };
@@ -319,7 +321,7 @@ export default function Home() {
                                 <span>{comment.totalDownvotes}</span>
 
                                 {/** Flag User Button */}
-                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
+                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
                                 <span>{isUserFlagged}Flag</span>
                             </div>
                         </div>
@@ -335,7 +337,8 @@ export default function Home() {
 
             {/** Portal for User Report Modal */}
             {showUserReportModal && portalContainerRef.current && (
-                    <UserReportModal onClose={handleCloseUserReportModal} />
+                    <UserReportModal onClose={handleCloseUserReportModal}
+                    currentUserId={currentUser.user_id} reportUserId={selectedUserId} />
             )}
 
             {/**  Portal container */}
