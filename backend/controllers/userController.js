@@ -90,7 +90,6 @@ async function authController(req, res) {
 
 async function loginController(req, res) {
     const { email, password } = req.body;
-    console.log(email, password)
     try{
         const user = await findUserWithEmail(email);
 
@@ -192,7 +191,6 @@ returns if found
 */
 async function getUserController(req, res) {
     const { id } = req.body
-    console.log("UserId: ", id)
 
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
@@ -434,7 +432,6 @@ async function postCommentController(req, res) {
                                 totalDownvotes: 0
                                 })
         
-        console.log(newComment);
         return res.json(newComment)
 
     }catch(error){
@@ -453,7 +450,6 @@ Retrieve and return comments
 */
 async function getCommentsController(req, res){
     const { id } = req.body
-    console.log("UserId: ", id)
     // Make sure id is mongoose valid
     if(!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: `${id} is invalid`})
@@ -496,7 +492,6 @@ async function getCommentsController(req, res){
 */
 async function reportController(req, res){
     const {userId, recipientId, recipientType, flag, comment} = req.body
-    console.log(req.query)
     recipientExist = "None";
 
     if(!mongoose.Types.ObjectId.isValid(userId)){
@@ -525,7 +520,6 @@ async function reportController(req, res){
 
     try{
         const report = await insertReport({userId: userId, recipientId: recipientExist.id, recipientType: recipientType, flag: flag, comment: comment})
-        console.log("Report: ", report)
         return res.status(202).json({msg: report})
     }catch(err){
         console.error(err)

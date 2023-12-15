@@ -31,6 +31,7 @@ export default function PastFacts() {
     const [newComment, setNewComment] = useState("");
     const [sortBy, setSortBy] = useState('latest');
     const [selectedFactId, setSelectedFactId] = useState(null);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
         const auth = async () => {
@@ -251,12 +252,13 @@ export default function PastFacts() {
         setShowFactReportModal(false);
     };
 
-    const handleUserFlagClick = () => {
+    const handleUserFlagClick = (userId) => {
         if(JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);
             return;
         }
         
+        setSelectedUserId(userId);
         setIsUserFlagged(true);
         setShowUserReportModal(true);
     };
@@ -364,7 +366,7 @@ export default function PastFacts() {
                                                 <span>{comment.totalDownvotes}</span>
 
                                                 {/** Flag User Button */}
-                                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={handleUserFlagClick} />
+                                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
                                                 <span>{isUserFlagged}Flag</span>
                                             </div>
                                         </div>
@@ -382,7 +384,8 @@ export default function PastFacts() {
 
                     {/** Portal for User Report Modal */}
                     {showUserReportModal && portalContainerRef.current && (
-                            <UserReportModal onClose={handleCloseUserReportModal} />
+                            <UserReportModal onClose={handleCloseUserReportModal}
+                            currentUserId={currentUser.user_id} reportUserId={selectedUserId} />
                     )}
 
                     {/**  Portal container */}
