@@ -44,10 +44,9 @@ export default function PastFacts() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
-                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.log(err);
+                    console.error(err);
                 }
             }
         }
@@ -111,7 +110,6 @@ export default function PastFacts() {
                     }
     
                     setPastFacts(updatedFacts);
-                    console.log(updatedFacts);
                 } else {
                     console.error('Failed to fetch past facts');
                 }
@@ -191,10 +189,28 @@ export default function PastFacts() {
 
         try {
             const updatedComment = await commentUpvoteRequest(comment._id, currentUser.user_id);
-            // setCommentUpvotes(updatedComment.totalUpvotes);
-            // setCommentDownvotes(updatedComment.totalDownvotes);
-            // setFact(updatedComment);
-            console.log(updatedComment);
+            const updatedFacts = pastFacts.map(fact => {
+                if (fact._id === updatedComment.factId) {
+                    const updatedComments = fact.comments.map(comment => {
+                        if (comment._id === updatedComment._id) {
+                            return {
+                                ...comment,
+                                totalUpvotes: updatedComment.totalUpvotes,
+                                totalDownvotes: updatedComment.totalDownvotes
+                            };
+                        }
+                        return comment;
+                    });
+            
+                    return {
+                        ...fact,
+                        comments: updatedComments
+                    };
+                }
+                return fact;
+            });
+
+            setPastFacts(updatedFacts)
         } catch(err) {
             console.error(err);
         }
@@ -209,12 +225,30 @@ export default function PastFacts() {
 
         try {
             const updatedComment = await commentDownvoteRequest(comment._id, currentUser.user_id);
-            // setCommentUpvotes(updatedComment.totalUpvotes);
-            // setCommentDownvotes(updatedComment.totalDownvotes);
-            // setFact(updatedComment);
-            console.log(updatedComment);
+            const updatedFacts = pastFacts.map(fact => {
+                if (fact._id === updatedComment.factId) {
+                    const updatedComments = fact.comments.map(comment => {
+                        if (comment._id === updatedComment._id) {
+                            return {
+                                ...comment,
+                                totalUpvotes: updatedComment.totalUpvotes,
+                                totalDownvotes: updatedComment.totalDownvotes
+                            };
+                        }
+                        return comment;
+                    });
+            
+                    return {
+                        ...fact,
+                        comments: updatedComments
+                    };
+                }
+                return fact;
+            });
+
+            setPastFacts(updatedFacts)
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
@@ -229,10 +263,8 @@ export default function PastFacts() {
 
         try {
             const res = await postCommentRequest(factId, currentUser.user_id, newComment);
-            console.log(res);
-            console.log(comments);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 

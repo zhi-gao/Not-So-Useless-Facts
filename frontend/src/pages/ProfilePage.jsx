@@ -116,13 +116,13 @@ const ProfilePage = () => {
                             <div key={index}>
                                 {/* Display facts based on the active tab */}
                                 {activeTab === 'comments' && (
-                                    <p><strong>{userName}</strong> commented on Fact {fact.factId}: {fact.comment}</p>
+                                    <p><strong>{userName}</strong> commented on <strong>Fact</strong> {new Date(fact.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}: {fact.comment}</p>
                                 )}
                                 {activeTab === 'upvoted' && (
-                                    <p><strong>{userName}</strong> upvoted on Fact: {fact.fact}</p>
+                                    <p><strong>{userName}</strong> upvoted on <strong>Fact</strong>: {fact.fact}</p>
                                 )}
                                 {activeTab === 'downvoted' && (
-                                    <p><strong>{userName}</strong> downvoted on Fact: {fact.fact}</p>
+                                    <p><strong>{userName}</strong> downvoted on <strong>Fact</strong>: {fact.fact}</p>
                                 )}
                             </div>
                         ))}

@@ -50,10 +50,9 @@ export default function Home() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
-                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.log(err);
+                    console.error(err);
                 }
             }
         }
@@ -126,10 +125,8 @@ export default function Home() {
 
         try {
             const res = await postCommentRequest(fact._id, currentUser.user_id, newComment);
-            console.log(res);
-            console.log(comments);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
     
@@ -170,7 +167,6 @@ export default function Home() {
             setFactUpvotes(updatedFact.totalUpvotes);
             setFactDownvotes(updatedFact.totalDownvotes);
             setFact(updatedFact);
-            console.log(updatedFact);
         } catch(err) {
             console.error(err);
         }
@@ -188,9 +184,8 @@ export default function Home() {
             setFactUpvotes(updatedFact.totalUpvotes);
             setFactDownvotes(updatedFact.totalDownvotes);
             setFact(updatedFact);
-            console.log(updatedFact);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
@@ -203,10 +198,18 @@ export default function Home() {
 
         try {
             const updatedComment = await commentUpvoteRequest(comment._id, currentUser.user_id);
-            // setCommentUpvotes(updatedComment.totalUpvotes);
-            // setCommentDownvotes(updatedComment.totalDownvotes);
-            // setFact(updatedComment);
-            console.log(updatedComment);
+            const updatedComments = comments.map(comment => {
+                if (comment._id === updatedComment._id) {
+                    return {
+                        ...comment,
+                        totalUpvotes: updatedComment.totalUpvotes,
+                        totalDownvotes: updatedComment.totalDownvotes
+                    };
+                }
+                return comment;
+            });
+            
+            setComments(updatedComments);
         } catch(err) {
             console.error(err);
         }
@@ -221,12 +224,20 @@ export default function Home() {
 
         try {
             const updatedComment = await commentDownvoteRequest(comment._id, currentUser.user_id);
-            // setCommentUpvotes(updatedComment.totalUpvotes);
-            // setCommentDownvotes(updatedComment.totalDownvotes);
-            // setFact(updatedComment);
-            console.log(updatedComment);
+            const updatedComments = comments.map(comment => {
+                if (comment._id === updatedComment._id) {
+                    return {
+                        ...comment,
+                        totalUpvotes: updatedComment.totalUpvotes,
+                        totalDownvotes: updatedComment.totalDownvotes
+                    };
+                }
+                return comment;
+            });
+            
+            setComments(updatedComments);
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }
 
