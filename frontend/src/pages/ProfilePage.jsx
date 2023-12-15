@@ -9,6 +9,8 @@ import Navbar from '../components/Nabar';
 import { UserContext } from "../context/UserContext";
 import { authRequest } from "../requests/authRequest";
 import { logoutRequest } from "../requests/logoutRequest";
+import loadingStyles from "./Loading.module.css";
+import {errMsg} from "./UserLogin.module.css";
 
 const ProfilePage = () => {
     const { username } = useParams();
@@ -18,8 +20,10 @@ const ProfilePage = () => {
     const navigate = useNavigate();
     const {currentUser, setCurrentUser} = useContext(UserContext);
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-    
-    useEffect(() => {
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => { 
         const auth = async () => {
             if(!localStorage.getItem("token")) {
                 return;
@@ -36,6 +40,10 @@ const ProfilePage = () => {
                     console.log(err);
                 }
             }
+
+            else {
+                setIsUserLoggedIn(true);
+            }
         }
         
         async function fetchUserName() {
@@ -44,6 +52,7 @@ const ProfilePage = () => {
                 setUserName(userData);
             } catch (error) {
                 console.error(`Error fetching username for ${username}:`, error);
+                setErrorMessage("Internal server error, cannot retrieve profile")
             }
         }
         
@@ -52,6 +61,7 @@ const ProfilePage = () => {
             await fetchUserName();
             await fetchData("comments");
             await auth();
+            setLoading(false);
         }
 
         helper();
@@ -97,11 +107,16 @@ const ProfilePage = () => {
         fetchData(tab);
     };
 
+    if(loading) {
+        return <div className={loadingStyles.ldsRing}><div></div><div></div><div></div><div></div></div>
+    }
+
     return (
         <div>
             {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="Past Facts" thirdButtonOnClick={() => navigate("/all-facts")} /> : <Navbar primaryButton="Home" primaryButtonOnClick={() => navigate("/")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="Logout" thirdButtonOnClick={() => logoutHandler()} />}
             <div className={styles.container}>
                 <div>
+                    {errorMessage && <div className={errMsg}>{errorMessage}</div>}
                     <h1>Profile: {userName}</h1>
                     <hr />
                     <div className={styles.buttons}>

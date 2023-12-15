@@ -67,6 +67,12 @@ export default function Login() {
             setCurrentUser(data);
             navigate(`/profile/${data.user_id}`);
         } catch (err) {
+            const httpCode = err.response?.status;
+            if(httpCode === 401) {
+                setErrorMessage("Invalid email or password");
+                return;
+            }
+
             console.error(err);
             setErrorMessage("Internal Server Error");
         }
