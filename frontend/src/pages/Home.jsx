@@ -16,7 +16,8 @@ import { commentDownvoteRequest } from "../requests/commentDownvoteRequest";
 import { postCommentRequest } from "../requests/postCommentRequest";
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
-import { logoutRequest } from "../requests/logoutRequest";
+import loadingStyles from "./Loading.module.css";
+import {errMsg} from "./UserLogin.module.css";
 
 export default function Home() {
     const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function Home() {
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(true);
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const auth = async () => {
@@ -55,6 +57,10 @@ export default function Home() {
                     console.error(err);
                 }
             }
+
+            else {
+                setIsUserLoggedIn(true);
+            }
         }
 
         {/** Fetch today's fact */}
@@ -67,10 +73,11 @@ export default function Home() {
                 setFactUpvotes(data.fact.totalUpvotes);
                 setFactDownvotes(data.fact.totalDownvotes);
                 setComments(data.fact.comments);
-
+                console.log(data.fact.comments);
                 setFact(data.fact);
             } catch (error) {
                 console.error("Error fetching fact:", error);
+                setErrorMessage("Internal server error while getting the fact");
             }
         }
 
@@ -124,7 +131,14 @@ export default function Home() {
         }
 
         try {
-            const res = await postCommentRequest(fact._id, currentUser.user_id, newComment);
+            const comment = await postCommentRequest(fact._id, currentUser.user_id, newComment);
+            setComments(prev => [...prev, {
+                comment : comment.comment,
+                userName : currentUser.username,
+                userId : currentUser.user_id
+            }]);
+            console.log(comment);
+            setNewComment("");
         } catch (err) {
             console.error(err);
         }
@@ -241,23 +255,12 @@ export default function Home() {
         }
     }
 
-    async function logoutHandler() {
-        try {
-            await logoutRequest(currentUser.email);
-            localStorage.removeItem("token");
-            setCurrentUser({});
-            navigate("/login");
-        } catch (err) {
-            console.error(err);
-        }
-    }
-
     const handleUserClick = (id) => {
         navigate(`/profile/${id}`);
     };
 
     if(loading) {
-        return <div>Loading...</div>
+        return <div className={loadingStyles.ldsRing}><div></div><div></div><div></div><div></div></div>
     }
 
     return <div>
@@ -273,7 +276,8 @@ export default function Home() {
         {/** Fact */}
         <div className={`${styles.flexContainer} ${styles.factSection}`}>
             <div>
-                <div className={styles.factTitle}>Fact of the Day #1</div>
+                {errorMessage && <div className={errMsg}>{errorMessage}</div>}
+                <div className={styles.factTitle}>Fact of the Day</div>
                 <div className={styles.factContent}>
                     {fact.fact}
                 </div>

@@ -15,6 +15,8 @@ import { commentDownvoteRequest } from "../requests/commentDownvoteRequest";
 import { postCommentRequest } from "../requests/postCommentRequest";
 import { getFactCommentsRequest } from "../requests/getFactCommentsRequest";
 import { getUsernameRequest } from "../requests/getUsernameRequest";
+import loadingStyles from "./Loading.module.css";
+import {errMsg} from "./UserLogin.module.css";
 
 export default function PastFacts() {
     const navigate = useNavigate();
@@ -32,6 +34,8 @@ export default function PastFacts() {
     const [sortBy, setSortBy] = useState('latest');
     const [selectedFactId, setSelectedFactId] = useState(null);
     const [selectedUserId, setSelectedUserId] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         const auth = async () => {
@@ -48,6 +52,10 @@ export default function PastFacts() {
                 } catch (err) {
                     console.error(err);
                 }
+            }
+
+            else {
+                setIsUserLoggedIn(true);
             }
         }
 
@@ -112,15 +120,18 @@ export default function PastFacts() {
                     setPastFacts(updatedFacts);
                 } else {
                     console.error('Failed to fetch past facts');
+                    setErrorMessage("Internal server occured");
                 }
             } catch (error) {
                 console.error('Error fetching past facts:', error);
+                setErrorMessage("Internal server occured");
             }
         }
 
         async function helper() {
             await fetchPastFacts();
             await auth();
+            setLoading(false);
         }
 
         helper();
@@ -311,6 +322,10 @@ export default function PastFacts() {
         navigate(`/profile/${username}`);
     };
 
+    if(loading) {
+        return <div className={loadingStyles.ldsRing}><div></div><div></div><div></div><div></div></div>
+    }
+
     return (
             <div>
             {(showLoginModal || showUserReportModal || showFactReportModal) && <div className={styles.backdrop}></div>}
@@ -323,6 +338,7 @@ export default function PastFacts() {
             </dialog>}
             {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.user_id}`)} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
             <div className={`${styles.flexContainer} ${styles.factSection}`}>
+                {errorMessage && <div className={errMsg}>{errorMessage}</div>}
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>
                     {/** Sort Facts */}

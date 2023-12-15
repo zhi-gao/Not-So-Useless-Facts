@@ -5,8 +5,8 @@ export async function postCommentRequest(factId, userId, comment) {
         const res = await axios.post("http://localhost:4000/comments/c", {
             userId, factId, comment
         });
-
-        return res.data?.comment;
+        
+        return res.data;
     } catch (err) {
         throw err;
     }
