@@ -11,11 +11,12 @@ async function factOfTheDayController(_, res) {
     // use api-ninja's api as default
 
     // search in the db if we have already documentated today's fact
+    const options = { timeZone: 'UTC' };
     const latestFact = await fetchLatestFact();
     const currentDate = new Date().toDateString();
 
     // daily fact found and is already in db
-    if(latestFact && new Date(currentDate).getTime() == new Date(latestFact.createdAt).getTime()) {
+    if(latestFact && new Date(currentDate).toLocaleDateString('en-US', options) == new Date(latestFact.createdAt).toLocaleDateString('en-US', options)) {
         return res.json({status : "OK", fact : latestFact, sourcedFrom: `${latestFact.sourceFrom} cached`});
     }
 

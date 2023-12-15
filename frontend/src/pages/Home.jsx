@@ -274,8 +274,8 @@ export default function Home() {
         </dialog>}
         {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> :  <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.user_id}`)} secondaryButton="Past Facts" secondaryButtonOnClick={() => navigate("/all-facts")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
         {/** Fact */}
-        <div className={`${styles.flexContainer} ${styles.factSection}`}>
-            <div>
+        <div className={styles.flexContainer}>
+            <div className={styles.factSection}>
                 {errorMessage && <div className={errMsg}>{errorMessage}</div>}
                 <div className={styles.factTitle}>Fact of the Day</div>
                 <div className={styles.factContent}>
@@ -317,30 +317,32 @@ export default function Home() {
 
                     {/** Show comments */}
                     <div><strong><h2>Comments</h2></strong></div>
-                    {comments.map((comment, index) => (
-                        <div key={index}>
-                            <div>
-                                <strong>
-                                    <a href="#" onClick={() => handleUserClick(comment.userId)}>
-                                        {(comment.userName)}
-                                    </a>
-                                </strong>: {comment.comment}
-                            </div>
-                            <div className={styles.iconsContainer}>
-                                {/** Upvote Comment Button */}
-                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => commentUpvoteHandler(comment)} />
-                                <span>{comment.totalUpvotes}</span>
+                    <div className={styles.comment}>
+                        {comments.map((comment, index) => (
+                            <div key={index}>
+                                <div>
+                                    <strong>
+                                        <a href="#" onClick={() => handleUserClick(comment.userId)}>
+                                            {(comment.userName)}
+                                        </a>
+                                    </strong>: {comment.comment}
+                                </div>
+                                <div className={styles.iconsContainer}>
+                                    {/** Upvote Comment Button */}
+                                    <FontAwesomeIcon icon={faAnglesUp} onClick={() => commentUpvoteHandler(comment)} />
+                                    <span>{comment.totalUpvotes}</span>
 
-                                {/** Downvote Comment Button */}
-                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => commentDownvoteHandler(comment)}  />
-                                <span>{comment.totalDownvotes}</span>
+                                    {/** Downvote Comment Button */}
+                                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => commentDownvoteHandler(comment)}  />
+                                    <span>{comment.totalDownvotes}</span>
 
-                                {/** Flag User Button */}
-                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
-                                <span>{isUserFlagged}Flag</span>
+                                    {/** Flag User Button */}
+                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
+                                    <span>{isUserFlagged}Flag</span>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             )}
 

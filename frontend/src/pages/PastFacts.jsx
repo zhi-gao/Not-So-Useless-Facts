@@ -65,11 +65,12 @@ export default function PastFacts() {
                 const response = await fetch('http://localhost:4000/facts');
                 if (response.ok) {
                     let data = await response.json();
+                    const options = { timeZone: 'UTC' };
                 
                     // Filter out the latest fact for the current day
-                    const today = new Date().toLocaleDateString();
+                    const today = new Date().toLocaleDateString('en-US', options);
                     data = data.filter((fact) => {
-                        const factDate = new Date(fact.createdAt).toLocaleDateString();
+                        const factDate = new Date(fact.createdAt).toLocaleDateString('en-US', options);
                         return factDate !== today;
                     });
                     
@@ -103,15 +104,15 @@ export default function PastFacts() {
                             break;
                         case 'most_upvoted':
                             // Sorting by most upvoted
-                            updatedFacts.sort((a, b) => b.upvotes - a.upvotes);
+                            updatedFacts.sort((a, b) => b.totalUpvotes - a.totalUpvotes);
                             break;
                         case 'most_downvoted':
                             // Sorting by most downvoted
-                            updatedFacts.sort((a, b) => b.downvotes - a.downvotes);
+                            updatedFacts.sort((a, b) => b.totalDownvotes - a.totalDownvotes);
                             break;
                         case 'most_commented':
                             // Sorting by most commented
-                            updatedFacts.sort((a, b) => b.commentCount - a.commentCount);
+                            updatedFacts.sort((a, b) => b.comments.length - a.comments.length);
                             break;
                         default:
                             break;
@@ -337,14 +338,15 @@ export default function PastFacts() {
                 </form>
             </dialog>}
             {!isUserLoggedIn ? <Navbar primaryButton="Login" primaryButtonOnClick={() => navigate("/login")} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} /> : <Navbar primaryButton="Profile" primaryButtonOnClick={() => navigate(`/profile/${currentUser.user_id}`)} secondaryButton="Home" secondaryButtonOnClick={() => navigate("/")}thirdButton="About Us" thirdButtonOnClick={() => navigate("/about")} />}
-            <div className={`${styles.flexContainer} ${styles.factSection}`}>
+            <div className={styles.flexContainer}>
                 {errorMessage && <div className={errMsg}>{errorMessage}</div>}
                 <div>
                 <div className={styles.factTitle}>Past Facts</div>
                     {/** Sort Facts */}
+                    
                     <div className={styles.sortRow}>
                         <label>
-                            Sort by:
+                            <strong>Sort by:</strong>
                             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
                                 <option value="latest">Latest</option>
                                 <option value="oldest">Oldest</option>
@@ -354,29 +356,32 @@ export default function PastFacts() {
                             </select>
                         </label>
                     </div>
+                    
 
                     {/** Past Facts */}
                     {pastFacts.map((fact) => (
                         <div key={fact._id} className={styles.factContent}>
+                            <div className={styles.factSection}>
                             <div style={{fontSize : "20px"}}>Date: {new Date(fact.createdAt).toDateString()}</div>
-                            Did you know: {fact.fact}
-                            
-                            <div className={styles.iconsRow}>
-                                {/** Upvote Fact Button */}
-                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => factUpvoteHandler(fact._id)} />
-                                <span>{fact.totalUpvotes}</span>
+                                Did you know: {fact.fact}
+                                
+                                <div className={styles.iconsRow}>
+                                    {/** Upvote Fact Button */}
+                                    <FontAwesomeIcon icon={faAnglesUp} onClick={() => factUpvoteHandler(fact._id)} />
+                                    <span>{fact.totalUpvotes}</span>
 
-                                {/** Downvote Fact Button */}
-                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => factDownvoteHandler(fact._id)} />
-                                <span>{fact.totalDownvotes}</span>
+                                    {/** Downvote Fact Button */}
+                                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => factDownvoteHandler(fact._id)} />
+                                    <span>{fact.totalDownvotes}</span>
 
-                                {/** Comment Fact Button */}
-                                <FontAwesomeIcon icon={faCommentDots} onClick={() => handleShowComments(fact._id)} />
-                                <span>{fact.comments.length}</span>
+                                    {/** Comment Fact Button */}
+                                    <FontAwesomeIcon icon={faCommentDots} onClick={() => handleShowComments(fact._id)} />
+                                    <span>{fact.comments.length}</span>
 
-                                {/** Flag Fact Button */}
-                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleFactFlagClick(fact._id)} />
-                                <span>{isFactFlagged}Flag</span>
+                                    {/** Flag Fact Button */}
+                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleFactFlagClick(fact._id)} />
+                                    <span>{isFactFlagged}Flag</span>
+                                </div>
                             </div>
                             {/** Comments */}
                             {factComments[fact._id] && (
@@ -395,30 +400,32 @@ export default function PastFacts() {
 
                                     {/** Show comments */}
                                     <div><strong><h2>Comments</h2></strong></div>
-                                    {fact.comments.map((comment, index) => (
-                                        <div key={index}>
-                                            <div>
-                                                <strong>
-                                                    <a href="#" onClick={() => handleUserClick(comment.userId)}>
-                                                        {comment.userName}
-                                                    </a>
-                                                </strong>: {comment.comment}
-                                            </div>
-                                            <div className={styles.iconsContainer}>
-                                                {/** Upvote Comment Button */}
-                                                <FontAwesomeIcon icon={faAnglesUp} onClick={() => commentUpvoteHandler(comment)} />
-                                                <span>{comment.totalUpvotes}</span>
+                                    <div className={styles.comment}>
+                                        {fact.comments.map((comment, index) => (
+                                            <div key={index}>
+                                                <div>
+                                                    <strong>
+                                                        <a href="#" onClick={() => handleUserClick(comment.userId)}>
+                                                            {comment.userName}
+                                                        </a>
+                                                    </strong>: {comment.comment}
+                                                </div>
+                                                <div className={styles.iconsContainer}>
+                                                    {/** Upvote Comment Button */}
+                                                    <FontAwesomeIcon icon={faAnglesUp} onClick={() => commentUpvoteHandler(comment)} />
+                                                    <span>{comment.totalUpvotes}</span>
 
-                                                {/** Downvote Comment Button */}
-                                                <FontAwesomeIcon icon={faAnglesDown} onClick={() => commentDownvoteHandler(comment)} />
-                                                <span>{comment.totalDownvotes}</span>
+                                                    {/** Downvote Comment Button */}
+                                                    <FontAwesomeIcon icon={faAnglesDown} onClick={() => commentDownvoteHandler(comment)} />
+                                                    <span>{comment.totalDownvotes}</span>
 
-                                                {/** Flag User Button */}
-                                                <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
-                                                <span>{isUserFlagged}Flag</span>
+                                                    {/** Flag User Button */}
+                                                    <FontAwesomeIcon icon={faExclamationTriangle} onClick={() => handleUserFlagClick(comment.userId)} />
+                                                    <span>{isUserFlagged}Flag</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
