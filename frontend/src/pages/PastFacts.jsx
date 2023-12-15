@@ -65,11 +65,12 @@ export default function PastFacts() {
                 const response = await fetch('http://localhost:4000/facts');
                 if (response.ok) {
                     let data = await response.json();
+                    const options = { timeZone: 'UTC' };
                 
                     // Filter out the latest fact for the current day
-                    const today = new Date().toLocaleDateString();
+                    const today = new Date().toLocaleDateString('en-US', options);
                     data = data.filter((fact) => {
-                        const factDate = new Date(fact.createdAt).toLocaleDateString();
+                        const factDate = new Date(fact.createdAt).toLocaleDateString('en-US', options);
                         return factDate !== today;
                     });
                     
@@ -103,15 +104,15 @@ export default function PastFacts() {
                             break;
                         case 'most_upvoted':
                             // Sorting by most upvoted
-                            updatedFacts.sort((a, b) => b.upvotes - a.upvotes);
+                            updatedFacts.sort((a, b) => b.totalUpvotes - a.totalUpvotes);
                             break;
                         case 'most_downvoted':
                             // Sorting by most downvoted
-                            updatedFacts.sort((a, b) => b.downvotes - a.downvotes);
+                            updatedFacts.sort((a, b) => b.totalDownvotes - a.totalDownvotes);
                             break;
                         case 'most_commented':
                             // Sorting by most commented
-                            updatedFacts.sort((a, b) => b.commentCount - a.commentCount);
+                            updatedFacts.sort((a, b) => b.comments.length - a.comments.length);
                             break;
                         default:
                             break;
@@ -344,7 +345,7 @@ export default function PastFacts() {
                     {/** Sort Facts */}
                     <div className={styles.sortRow}>
                         <label>
-                            Sort by:
+                            <strong>Sort by:</strong>
                             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
                                 <option value="latest">Latest</option>
                                 <option value="oldest">Oldest</option>

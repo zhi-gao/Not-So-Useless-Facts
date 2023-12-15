@@ -29,6 +29,24 @@
     align-items: center;
 }
 
+.sortRow select {
+    border: none;
+    appearance: none;
+    background-color: transparent;
+    padding: 5px;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.sortRow select:hover {
+    background-color: #f0f0f0;
+}
+
+.sortRow select:focus {
+    outline: none;
+}
+
+
 .factContent {
     font-size: 35px;
     margin-top: 50px;
@@ -88,6 +106,16 @@
     .factContent {
         font-size: 18px;
         margin-top: 15px;
+    }
+
+    .sortRow {
+        font-size: 20px;
+        margin-top: 20px;
+    }
+
+    .sortRow select {
+        font-size: 20px;
+        padding: 8px;
     }
 
     .iconsRow {

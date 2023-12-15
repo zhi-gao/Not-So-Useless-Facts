@@ -4,15 +4,15 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
     min-height: 100vh;
 }
 
 .factSection {
-    margin-top: -50px;
+    margin-top: 50px;
     margin-left: 15%;
     margin-right: 15%;
+    align-items: center;
+    text-align: center;
 }
 
 .factTitle {
@@ -37,6 +37,9 @@
 }
 
 .commentsContainer {
+    margin-top: 50px;
+    margin-left: 15%;
+    margin-right: 15%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -44,10 +47,24 @@
     font-size: 20px;
 }
 
+.commentsContainer textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.commentInput button {
+    margin-left: auto;
+}
+
 .iconsContainer {
     display: flex;
     justify-content: flex-end;
     gap: 5px;
+    margin-left: auto;
 }
 
 .backdrop {
@@ -67,49 +84,22 @@
 
 /* Media query for smaller screens, such as mobile devices */
 @media screen and (max-width: 768px) {
-    .factSection {
-        margin-left: 2%;
-        margin-right: 2%;
-    }
-
     .factTitle {
         font-size: 24px;
     }
 
     .factContent {
         font-size: 18px;
-        margin-top: 15px;
-    }
-
-    .iconsRow {
-        font-size: 16px;
-        margin-top: 15px;
-        margin-right: 10px;
-    }
-
-    .commentsContainer {
-        font-size: 14px;
-    }
-
-    /* Adjustments for comments section and input box */
-    .commentsContainer {
-        font-size: 14px;
-        width: 100%;
         margin-top: 20px;
     }
 
-    .commentsContainer textarea {
-        width: calc(100% - 20px);
-        max-width: 100%;
-        font-size: 14px;
-        margin-bottom: 10px;
+    .iconsRow {
+        font-size: 18px;
+        margin-top: 20px;
     }
 
-    .commentsContainer button {
-        width: 100px;
-        height: 30px;
+    .commentsContainer {
+        margin-top: 20px;
         font-size: 14px;
-        margin-top: 10px;
     }
 }
-
