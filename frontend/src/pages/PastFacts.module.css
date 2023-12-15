@@ -4,8 +4,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
     min-height: 100vh;
 }
 
@@ -13,20 +11,26 @@
     margin-top: 50px;
     margin-left: 15%;
     margin-right: 15%;
+    align-items: center;
+    text-align: center;
 }
 
 .factTitle {
     font-size: 45px;
     font-weight: bold;
+    text-align: center;
 }
 
 .sortRow {
+    margin-top: 50px;
+    margin-left: 15%;
+    margin-right: 15%;
     font-size: 30px;
     font-weight: bold;
-    margin-top: 50px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
+    text-align: center;
 }
 
 .sortRow select {
@@ -46,7 +50,6 @@
     outline: none;
 }
 
-
 .factContent {
     font-size: 35px;
     margin-top: 50px;
@@ -64,6 +67,9 @@
 }
 
 .commentsContainer {
+    margin-top: 50px;
+    margin-left: 15%;
+    margin-right: 15%;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -71,10 +77,24 @@
     font-size: 20px;
 }
 
+.commentsContainer textarea {
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.commentInput button {
+    margin-left: auto;
+}
+
 .iconsContainer {
     display: flex;
     justify-content: flex-end;
     gap: 5px;
+    margin-left: auto;
 }
 
 .backdrop {
@@ -108,24 +128,10 @@
         margin-top: 15px;
     }
 
-    .sortRow {
-        font-size: 20px;
-        margin-top: 20px;
-    }
-
-    .sortRow select {
-        font-size: 20px;
-        padding: 8px;
-    }
-
     .iconsRow {
         font-size: 16px;
         margin-top: 15px;
         margin-right: 10px;
-    }
-
-    .commentsContainer {
-        font-size: 14px;
     }
 
     /* Adjustments for comments section and input box */
