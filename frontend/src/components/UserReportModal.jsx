@@ -10,9 +10,7 @@ const UserReportModal = ({ onClose, currentUserId, reportUserId  }) => {
     // Handle submission logic here, you can send the report data to the server or perform other actions
     try {
       const res = await reportRequest(currentUserId, reportUserId, "User", reportReason, details);
-      console.log(res);
   } catch (err) {
-      console.log(err);
   }
     // Close the modal after submitting
     onClose();

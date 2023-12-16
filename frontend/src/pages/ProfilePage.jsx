@@ -34,10 +34,8 @@ const ProfilePage = () => {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
-                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.log(err);
                 }
             }
 
@@ -51,7 +49,6 @@ const ProfilePage = () => {
                 const userData = await getUsernameRequest(username);
                 setUserName(userData);
             } catch (error) {
-                console.error(`Error fetching username for ${username}:`, error);
                 setErrorMessage("Internal server error, cannot retrieve profile")
             }
         }
@@ -73,11 +70,9 @@ const ProfilePage = () => {
         switch (tab) {
             case 'comments':
                 data = await getFactCommentsRequest(username);
-                console.log("comment data: ", data)
                 break;
             case 'upvoted':
                 data = await getUpvoteFactRequest(username);
-                console.log("upvote data: ", data)
                 break;
             case 'downvoted':
                 data = await getDownvoteFactRequest(username);
@@ -90,14 +85,12 @@ const ProfilePage = () => {
     };
 
     async function logoutHandler() {
-        console.log("user logout...")
         try {
             await logoutRequest(currentUser.email);
             localStorage.removeItem("token");
             setCurrentUser({});
             navigate("/login");
         } catch (err) {
-            console.error(err);
         }
     }
 

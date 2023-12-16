@@ -54,7 +54,6 @@ export default function Home() {
                     setCurrentUser(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.error(err);
                 }
             }
 
@@ -73,10 +72,8 @@ export default function Home() {
                 setFactUpvotes(data.fact.totalUpvotes);
                 setFactDownvotes(data.fact.totalDownvotes);
                 setComments(data.fact.comments);
-                console.log(data.fact.comments);
                 setFact(data.fact);
             } catch (error) {
-                console.error("Error fetching fact:", error);
                 setErrorMessage("Internal server error while getting the fact");
             }
         }
@@ -137,10 +134,9 @@ export default function Home() {
                 userName : currentUser.username,
                 userId : currentUser.user_id
             }]);
-            console.log(comment);
             setNewComment("");
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot post comment, internal server error");
         }
     }
     
@@ -152,7 +148,7 @@ export default function Home() {
                 const updatedComment = { ...comment, userName: userData };
                 updatedCommentsData.push(updatedComment);
             } catch (error) {
-                console.error(`Error fetching username for userId ${comment.userId}:`, error);
+                setErrorMessage("Internal Server Error");
                 updatedCommentsData.push(comment);
             }
         }
@@ -182,7 +178,7 @@ export default function Home() {
             setFactDownvotes(updatedFact.totalDownvotes);
             setFact(updatedFact);
         } catch(err) {
-            console.error(err);
+            setErrorMessage("Cannot upvote fact, internal server error");
         }
     }
 
@@ -199,7 +195,7 @@ export default function Home() {
             setFactDownvotes(updatedFact.totalDownvotes);
             setFact(updatedFact);
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot downvote fact, internal server error");
         }
     }
 
@@ -225,7 +221,7 @@ export default function Home() {
             
             setComments(updatedComments);
         } catch(err) {
-            console.error(err);
+            setErrorMessage("Cannot upvote comment, internal server error");
         }
     }
 
@@ -251,7 +247,7 @@ export default function Home() {
             
             setComments(updatedComments);
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot downvote comment, internal server error");
         }
     }
 

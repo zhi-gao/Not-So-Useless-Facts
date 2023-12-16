@@ -62,7 +62,6 @@ export default function Login() {
         try {
             const data = await loginRequest(email, password);
 
-            console.log(data);
             localStorage.setItem("token", data.accessToken);
             setCurrentUser(data);
             navigate(`/profile/${data.user_id}`);
@@ -73,7 +72,6 @@ export default function Login() {
                 return;
             }
 
-            console.error(err);
             setErrorMessage("Internal Server Error");
         }
     }
