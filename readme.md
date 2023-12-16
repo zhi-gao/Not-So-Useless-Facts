@@ -2,6 +2,9 @@
 
 Provide random fact everyday!
 
+Online demo link https://not-so-useless-facts.fly.dev/
+
+
 ## Installation
 1. Manually
     1. Run `npm install` in the both frontend and backend folder
