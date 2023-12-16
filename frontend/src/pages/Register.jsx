@@ -25,12 +25,12 @@ export default function Register() {
         const confirmPassword = formRefs.confirmPassword.current?.value;
 
         if(!username) {
-            setErrorMessage("Username must be cannot be empty");
+            setErrorMessage("Username cannot be empty");
             return;
         }
 
         if(!email) {
-            setErrorMessage("Email must be cannot be empty");
+            setErrorMessage("Email cannot be empty");
             return;
         }
 
@@ -62,7 +62,12 @@ export default function Register() {
             await registerRequest(username, email, password);
             navigate("/login");
         } catch (err) {
-            console.log(err);
+            const httpCode = err.response?.status;
+            if(httpCode === 400) {
+                setErrorMessage("Account already exist");
+                return;
+            }
+            
             setErrorMessage("Internal Server Error")
         }
     }

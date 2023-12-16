@@ -1,8 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Navbar from '../components/Nabar';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../context/UserContext';
-import { logoutRequest } from '../requests/logoutRequest';
 import styles from "./Home.module.css";
 import { authRequest } from '../requests/authRequest';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +25,6 @@ export default function About() {
                     console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.log(err);
                 }
             }
 

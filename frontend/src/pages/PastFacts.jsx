@@ -50,7 +50,6 @@ export default function PastFacts() {
                     setCurrentUser(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
-                    console.error(err);
                 }
             }
 
@@ -120,11 +119,9 @@ export default function PastFacts() {
     
                     setPastFacts(updatedFacts);
                 } else {
-                    console.error('Failed to fetch past facts');
                     setErrorMessage("Internal server occured");
                 }
             } catch (error) {
-                console.error('Error fetching past facts:', error);
                 setErrorMessage("Internal server occured");
             }
         }
@@ -163,7 +160,7 @@ export default function PastFacts() {
             });
             setPastFacts(updatedFacts);
         } catch(err) {
-            console.error(err);
+            setErrorMessage("Cannot upvote fact, internal server error");
         }
     }
 
@@ -188,7 +185,7 @@ export default function PastFacts() {
             });
             setPastFacts(updatedFacts);
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot downvote fact, internal server error");
         }
     }
 
@@ -224,7 +221,7 @@ export default function PastFacts() {
 
             setPastFacts(updatedFacts)
         } catch(err) {
-            console.error(err);
+            setErrorMessage("Cannot upvote comment, internal server error");
         }
     }
 
@@ -260,7 +257,7 @@ export default function PastFacts() {
 
             setPastFacts(updatedFacts)
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot downvote comment, internal server error");
         }
     }
 
@@ -276,7 +273,7 @@ export default function PastFacts() {
         try {
             const res = await postCommentRequest(factId, currentUser.user_id, newComment);
         } catch (err) {
-            console.error(err);
+            setErrorMessage("Cannot post comment, internal server error");
         }
     }
 
