@@ -26,6 +26,19 @@
     margin-bottom: 10px;
 }
 
+.aboutTitle {
+    font-size: 45px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.aboutContent {
+    font-size: 35px;
+    margin-top: 50px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
 .iconsRow {
     font-size: 35px;
     margin-top: 50px;
@@ -94,6 +107,15 @@
     }
 
     .factContent {
+        font-size: 18px;
+        margin-top: 15px;
+    }
+
+    .aboutTitle {
+        font-size: 24px;
+    }
+
+    .aboutContent {
         font-size: 18px;
         margin-top: 15px;
     }
