@@ -127,7 +127,6 @@ export default function Home() {
 
         try {
             const comment = await postCommentRequest(fact._id, currentUser.user_id, newComment);
-            console.log("comment", comment)
             setComments(prev => [...prev, {
                 comment : comment.comment,
                 userName : currentUser.username,
