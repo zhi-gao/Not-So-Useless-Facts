@@ -261,22 +261,31 @@ export default function PastFacts() {
         }
     }
 
-
     const handleCommentSubmit = async (factId) => {
-        if(newComment === "") return;
-
-        if(JSON.stringify(currentUser) === "{}") {
+        if (newComment === "") return;
+    
+        if (JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);
             return;
         }
-
+    
         try {
             const res = await postCommentRequest(factId, currentUser.user_id, newComment);
+    
+            const updatedFacts = pastFacts.map(fact => {
+                if (fact._id === res.factId) {
+                    res.userName = currentUser.username;
+                    fact.comments.push(res);
+                }
+                return fact;
+            });
+    
+            setPastFacts(updatedFacts);
         } catch (err) {
             setErrorMessage("Cannot post comment, internal server error");
         }
-    }
-
+    };
+    
     const handleFactFlagClick = (factId) => {
         if(JSON.stringify(currentUser) === "{}") {
             setShowLoginModal(true);

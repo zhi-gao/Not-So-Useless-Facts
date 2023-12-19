@@ -2,7 +2,7 @@
 
 Provide random fact everyday!
 
-Online demo link https://not-so-useless-facts.fly.dev/
+Online demo link https://not-so-useless-facts.web.app/
 
 
 ## Installation
@@ -22,16 +22,24 @@ Online demo link https://not-so-useless-facts.fly.dev/
 ```
 DEV_MODE=dev
 PORT=4000
-FRONTEND_HOST=http://localhost:3000/
+FRONTEND_HOST=http://localhost:5173/
 DATABASE_PASSWORD=abc123
 DATABASE_URL=mongodb://root:abc123@localhost:27017/nsuf?directConnection=true&authSource=admin&retryWrites=true
 API_NINJA_API_KEY=
+JWT_ACCESS_TOKEN_KEY=a19c184d32a81744f273
+JWT_REFRESH_TOKEN_KEY=434e1e839567de0f5e7c
 ```
 
 ## Database
 You can get a database connection with either MongoDB ATLAS, locally if hosted on your computer, or using Docker (fastest and recommended).
 
 Once you have setup your server, just update your `.env` and changed the variable `DATABASE_URL=mongodb://root:<mongodb-password>@<host>:<port>/<project-name>?directConnection=true&authSource=admin&retryWrites=true`
+
+## Run the Application
+Once you have setup the enviroment
+1. Run `npm start` in the backend folder
+2. Run `npm run dev` in the frontend folder
+3. Enjoy!
 
 ## Contributing
 If you are going to push your changes, **please push to a seperate branch FIRST and submit a PR**.

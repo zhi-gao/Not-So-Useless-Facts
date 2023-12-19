@@ -17,7 +17,6 @@ export default function Profile() {
 
                 setUser(data);
                 setCurrentUser(user);
-                console.log({currentUser});
                 setLoading(false);
             } catch (err) {
                 console.error(err);

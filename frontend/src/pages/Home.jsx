@@ -25,8 +25,6 @@ export default function Home() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
     const [factUpvotes, setFactUpvotes] = useState(0);
     const [factDownvotes, setFactDownvotes] = useState(0);
-    const [commentUpvotes, setCommentUpvotes] = useState(0);
-    const [commentDownvotes, setCommentDownvotes] = useState(0);
     const [comments, setComments] = useState([]);
     const [showComments, setShowComments] = useState(false);
     const [isFactFlagged, setIsFactFlagged] = useState(false);
@@ -132,7 +130,9 @@ export default function Home() {
             setComments(prev => [...prev, {
                 comment : comment.comment,
                 userName : currentUser.username,
-                userId : currentUser.user_id
+                userId : currentUser.user_id,
+                totalUpvotes: comment.totalUpvotes,
+                totalDownvotes: comment.totalDownvotes
             }]);
             setNewComment("");
         } catch (err) {

@@ -22,7 +22,6 @@ export default function About() {
                     // make auth request
                     const data = await authRequest();
                     setCurrentUser(data);
-                    console.log(data);
                     setIsUserLoggedIn(true);
                 } catch (err) {
                 }
