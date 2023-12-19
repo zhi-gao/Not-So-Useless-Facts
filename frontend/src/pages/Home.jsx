@@ -129,6 +129,7 @@ export default function Home() {
             const comment = await postCommentRequest(fact._id, currentUser.user_id, newComment);
             setComments(prev => [...prev, {
                 comment : comment.comment,
+                _id: comment._id,
                 userName : currentUser.username,
                 userId : currentUser.user_id,
                 totalUpvotes: comment.totalUpvotes,

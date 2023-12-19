@@ -132,7 +132,6 @@
     /* Adjustments for comments section and input box */
     .commentsContainer {
         font-size: 14px;
-        width: 100%;
         margin-top: 20px;
     }
 
@@ -148,5 +147,18 @@
         height: 30px;
         font-size: 14px;
         margin-top: 10px;
+    }
+
+    .comment {
+        justify-content: flex-start;
+        align-items: flex-start;
+        font-size: 14px;
+    }
+    
+    .iconsContainer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+        margin-left: auto;
     }
 }
