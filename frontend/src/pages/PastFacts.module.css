@@ -169,4 +169,17 @@
         margin-top: 10px;
         align-self: flex-end;
     }
+
+    .comment {
+        justify-content: flex-start;
+        align-items: flex-start;
+        font-size: 14px;
+    }
+    
+    .iconsContainer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+        margin-left: auto;
+    }
 }
